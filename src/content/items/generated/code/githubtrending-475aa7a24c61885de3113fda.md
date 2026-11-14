@@ -9,11 +9,11 @@ source:
   external_id: "louislam/uptime-kuma"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-14T03:45:00.988586+08:00"
+retrieved_at: "2026-11-15T03:45:01.112405+08:00"
 published_at: "2026-11-14T03:50:03.463692+08:00"
-summary: "精美的自托管监控工具，便于搭建站点与服务可用性监控及告警。"
+summary: "界面精美、可自托管的网站与服务监控工具。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14"]
+briefing_ids: ["code-2026-11-14", "code-2026-11-15"]
 ---

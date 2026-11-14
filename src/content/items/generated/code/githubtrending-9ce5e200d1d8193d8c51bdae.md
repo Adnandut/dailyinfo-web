@@ -9,11 +9,11 @@ source:
   external_id: "backnotprop/plannotator"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-14T03:45:00.988586+08:00"
+retrieved_at: "2026-11-15T03:45:01.112405+08:00"
 published_at: "2026-11-14T03:50:03.463692+08:00"
-summary: "面向Agent协作的工作空间，支持规划、标注、代码审查、团队分享及一键将反馈发送给Agent。"
+summary: "Plannotator 是面向编码智能体协作的工作区，支持规划、标注、代码审查、团队共享并一键回传反馈给 Agent。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14"]
+briefing_ids: ["code-2026-11-14", "code-2026-11-15"]
 ---
