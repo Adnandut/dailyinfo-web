@@ -14,5 +14,5 @@ summary: "符合条件的青年科研人员需按通知要求申请国家自然�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-08", "resource-2026-11-09", "resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14"]
+briefing_ids: ["resource-2026-11-09", "resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14"]
 ---

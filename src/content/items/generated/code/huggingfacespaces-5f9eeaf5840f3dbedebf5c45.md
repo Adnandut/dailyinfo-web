@@ -15,5 +15,5 @@ summary: "Gradio 人脸交换应用，提供高质量人脸替换与图像合成
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-08", "code-2026-11-09", "code-2026-11-10", "code-2026-11-11", "code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-09", "code-2026-11-10", "code-2026-11-11", "code-2026-11-13", "code-2026-11-14"]
 ---

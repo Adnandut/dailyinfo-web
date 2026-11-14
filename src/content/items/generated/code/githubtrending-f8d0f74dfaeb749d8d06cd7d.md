@@ -15,5 +15,5 @@ summary: "面向裸金属 GPU Kubernetes 的管理平面，简化 NVIDIA GPU 集
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-08", "code-2026-11-09"]
+briefing_ids: ["code-2026-11-09"]
 ---

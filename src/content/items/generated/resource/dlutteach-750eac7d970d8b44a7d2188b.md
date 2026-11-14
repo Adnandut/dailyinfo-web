@@ -14,5 +14,5 @@ summary: "请相关教师按通知要求提交优质课程资源，以征集上�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-08", "resource-2026-11-09", "resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14"]
+briefing_ids: ["resource-2026-11-09", "resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14"]
 ---

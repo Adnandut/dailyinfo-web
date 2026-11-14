@@ -14,5 +14,5 @@ summary: "有意参加的师生需按通知要求报名参加2026博士生国际
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-08", "resource-2026-11-09", "resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14"]
+briefing_ids: ["resource-2026-11-09", "resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14"]
 ---

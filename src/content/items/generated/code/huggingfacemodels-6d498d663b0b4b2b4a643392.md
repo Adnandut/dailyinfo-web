@@ -15,5 +15,5 @@ summary: "Lightricks LTX-2.5图生视频模型，主打从静态图像生成连�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-08", "code-2026-11-09", "code-2026-11-10", "code-2026-11-11", "code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-09", "code-2026-11-10", "code-2026-11-11", "code-2026-11-13", "code-2026-11-14"]
 ---
