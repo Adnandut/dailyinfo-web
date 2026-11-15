@@ -15,5 +15,5 @@ summary: "提供扫描实物生成的GLB 3D模型集合，适用于真实感场�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-09", "code-2026-11-10", "code-2026-11-11"]
+briefing_ids: ["code-2026-11-10", "code-2026-11-11"]
 ---

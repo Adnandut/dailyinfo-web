@@ -15,5 +15,5 @@ summary: "基于Qwen3.5-4B的GLB 3D代码生成模型，打通文本指令到3D�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-09", "code-2026-11-10", "code-2026-11-11"]
+briefing_ids: ["code-2026-11-10", "code-2026-11-11"]
 ---

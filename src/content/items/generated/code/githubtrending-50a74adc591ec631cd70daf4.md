@@ -15,5 +15,5 @@ summary: "milind-soni/OpenMausBot 是开源 Grok Bot 替代方案，为机器人
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-09", "code-2026-11-10"]
+briefing_ids: ["code-2026-11-10"]
 ---

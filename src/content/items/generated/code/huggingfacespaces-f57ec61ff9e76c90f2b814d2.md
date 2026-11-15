@@ -9,11 +9,11 @@ source:
   external_id: "speridlabs/idol"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-14T11:21:50.210637+08:00"
+retrieved_at: "2026-11-16T03:45:29.317508+08:00"
 published_at: "2026-11-03T03:45:45.144897+08:00"
-summary: "以 Gradio 呈现的 IDOL 交互式视觉生成应用，突出个性化与可控生成能力。"
+summary: "SperID Labs 的 IDOL Gradio 应用，聚焦身份/角色相关生成与编辑的交互式演示。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-09", "code-2026-11-10", "code-2026-11-11", "code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-10", "code-2026-11-11", "code-2026-11-13", "code-2026-11-14", "code-2026-11-16"]
 ---

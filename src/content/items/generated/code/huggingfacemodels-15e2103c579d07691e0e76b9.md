@@ -9,11 +9,11 @@ source:
   external_id: "Cactus-Compute/mirage"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-14T11:21:27.732595+08:00"
+retrieved_at: "2026-11-16T03:45:09.319909+08:00"
 published_at: "2026-11-14T11:22:00.315442+08:00"
-summary: "Cactus Compute多模态图文模型Mirage，面向端侧或高效推理的图文理解与生成。"
+summary: "Cactus-Compute Mirage 多模态图文模型，主打高效端侧推理与图文理解。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14"]
+briefing_ids: ["code-2026-11-14", "code-2026-11-16"]
 ---

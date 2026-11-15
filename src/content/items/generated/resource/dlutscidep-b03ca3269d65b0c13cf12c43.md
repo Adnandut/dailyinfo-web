@@ -14,5 +14,5 @@ summary: "相关科研人员需按基金委通告要求征集并提交“进入�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-09", "resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15"]
+briefing_ids: ["resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15"]
 ---

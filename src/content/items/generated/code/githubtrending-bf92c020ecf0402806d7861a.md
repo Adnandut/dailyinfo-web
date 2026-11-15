@@ -15,5 +15,5 @@ summary: "面向超长会话的上下文压缩插件，以 100K 小窗口支撑�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-09", "code-2026-11-11"]
+briefing_ids: ["code-2026-11-11"]
 ---

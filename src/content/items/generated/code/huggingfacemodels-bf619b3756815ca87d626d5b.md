@@ -9,11 +9,11 @@ source:
   external_id: "mradermacher/gemma-4-31B-it-ARA-heretic-GGUF"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-14T11:21:27.732595+08:00"
+retrieved_at: "2026-11-16T03:45:09.319909+08:00"
 published_at: "2026-11-13T08:38:21.049658+08:00"
-summary: "Gemma-4-31B指令模型的去审查GGUF量化版，面向本地高自由度文本生成与创作场景。"
+summary: "Gemma-4-31B 指令微调的 ARA/Heretic 无审查 GGUF 量化版，面向本地自由文本生成。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16"]
 ---

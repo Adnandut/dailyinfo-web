@@ -9,11 +9,11 @@ source:
   external_id: "MiniMaxAI/MiniMax-H3-Image"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-14T11:21:27.732595+08:00"
+retrieved_at: "2026-11-16T03:45:09.319909+08:00"
 published_at: "2026-11-11T03:45:42.303353+08:00"
-summary: "MiniMax H3图像生成模型，主打高质量文生图与较强的提示词遵循能力。"
+summary: "MiniMax H3 文生图模型，面向高保真图像生成与创意视觉内容生产。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14", "code-2026-11-16"]
 ---

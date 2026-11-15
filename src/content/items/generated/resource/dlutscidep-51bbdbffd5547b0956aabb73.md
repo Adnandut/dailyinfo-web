@@ -14,5 +14,5 @@ summary: "请医学科学领域相关科研人员按第三批专项项目指南�
 why_it_matters: null
 tags: ["科研项目申报"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-09", "resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13"]
+briefing_ids: ["resource-2026-11-10", "resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13"]
 ---
