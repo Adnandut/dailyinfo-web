@@ -9,11 +9,11 @@ source:
   external_id: "codepawl/pixel-atlas-glb"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-16T03:45:19.968178+08:00"
+retrieved_at: "2026-11-17T03:45:20.530625+08:00"
 published_at: "2026-11-16T03:45:40.709758+08:00"
-summary: "将像素图集打包为GLB格式的3D资源，便于在Web和游戏引擎中直接加载与渲染。"
+summary: "提供以像素图集打包的GLB 3D模型资源，便于游戏与Web端快速加载像素风3D资产和搭建场景。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
 ---

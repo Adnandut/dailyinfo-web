@@ -9,11 +9,11 @@ source:
   external_id: "chatrlabs/Qwen-Image-2.1-Uncensored-Omni-Quantized"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-16T03:45:09.319909+08:00"
+retrieved_at: "2026-11-17T03:45:10.403637+08:00"
 published_at: "2026-11-16T03:45:40.709758+08:00"
-summary: "Qwen-Image 2.1 无审查 Omni 量化文生图模型，面向高自由度图像创作与本地部署。"
+summary: "基于Qwen-Image-2.1的免审查全模态量化文生图模型，主打高自由度生成与低资源部署。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
 ---

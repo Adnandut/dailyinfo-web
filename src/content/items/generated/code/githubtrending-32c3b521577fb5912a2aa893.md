@@ -9,11 +9,11 @@ source:
   external_id: "tradermonty/claude-trading-skills"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-16T03:45:00.936281+08:00"
+retrieved_at: "2026-11-17T03:45:00.990505+08:00"
 published_at: "2026-11-14T03:50:03.463692+08:00"
-summary: "claude-trading-skills 为股票投资者和交易员提供 Claude Code 技能，覆盖市场分析、技术图表、经济日历、筛选器和交易策略开发。"
+summary: "为股票投资者和交易员提供 Claude Code 技能集，覆盖行情分析、技术图表、经济日历、筛选器与交易策略开发。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-15", "code-2026-11-16"]
+briefing_ids: ["code-2026-11-14", "code-2026-11-15", "code-2026-11-16", "code-2026-11-17"]
 ---

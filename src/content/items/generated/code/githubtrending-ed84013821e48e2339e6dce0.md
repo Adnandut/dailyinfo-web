@@ -9,11 +9,11 @@ source:
   external_id: "elementalsouls/Claude-BugHunter"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-16T03:45:00.936281+08:00"
+retrieved_at: "2026-11-17T03:45:00.990505+08:00"
 published_at: "2026-11-16T03:45:40.709758+08:00"
-summary: "Claude-BugHunter 是面向漏洞挖掘与外部红队工作的 Claude Code 技能包，内置 82 个技能、15 个斜杠命令和覆盖 24 类漏洞的 681 个披露报告模式。"
+summary: "面向漏洞挖掘与外部红队工作的 Claude Code 技能包，内置 82 项技能、15 个斜杠命令及跨 24 类漏洞的 681 个披露报告模式。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
 ---

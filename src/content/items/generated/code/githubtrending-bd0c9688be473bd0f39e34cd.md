@@ -9,11 +9,11 @@ source:
   external_id: "ChromeDevTools/chrome-devtools-mcp"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-16T03:45:00.936281+08:00"
+retrieved_at: "2026-11-17T03:45:00.990505+08:00"
 published_at: "2026-11-14T03:50:03.463692+08:00"
-summary: "chrome-devtools-mcp 将 Chrome DevTools 能力通过 MCP 提供给编码 Agent，便于其调试和分析浏览器应用。"
+summary: "通过 MCP 将 Chrome DevTools 能力提供给编码 Agent，用于浏览器调试、性能分析和页面检查。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-15", "code-2026-11-16"]
+briefing_ids: ["code-2026-11-14", "code-2026-11-15", "code-2026-11-16", "code-2026-11-17"]
 ---
