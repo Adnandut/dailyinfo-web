@@ -15,5 +15,5 @@ summary: "面向材料科学的AI检索与发现平台，用智能搜索加速�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-10", "code-2026-11-11"]
+briefing_ids: ["code-2026-11-11"]
 ---

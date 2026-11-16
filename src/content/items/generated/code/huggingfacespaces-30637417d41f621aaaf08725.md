@@ -15,5 +15,5 @@ summary: "免费AI文本人性化工具，将机器生成文本改写得更自�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-10", "code-2026-11-11"]
+briefing_ids: ["code-2026-11-11"]
 ---

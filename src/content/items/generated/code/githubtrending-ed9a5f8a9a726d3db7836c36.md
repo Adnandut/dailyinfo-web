@@ -15,5 +15,5 @@ summary: "基于 Claude API 的可部署应用快速入门项目合集，帮助�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-10", "code-2026-11-11"]
+briefing_ids: ["code-2026-11-11"]
 ---

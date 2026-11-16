@@ -15,5 +15,5 @@ summary: "Anthropic 公开的 Agent Skills 仓库，提供可复用技能规范�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-10", "code-2026-11-11"]
+briefing_ids: ["code-2026-11-11"]
 ---

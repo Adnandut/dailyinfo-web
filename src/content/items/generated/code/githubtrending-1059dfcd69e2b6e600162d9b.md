@@ -15,5 +15,5 @@ summary: "DeepMind 开源的高性能通用物理仿真器，支持多关节动�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-10", "code-2026-11-11"]
+briefing_ids: ["code-2026-11-11"]
 ---

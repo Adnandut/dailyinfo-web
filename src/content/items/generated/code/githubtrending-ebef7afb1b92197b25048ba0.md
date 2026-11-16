@@ -15,5 +15,5 @@ summary: "通过 MCP 让 Claude、ChatGPT 等 AI 助手配置和自动化 Home A
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-10", "code-2026-11-11", "code-2026-11-12"]
+briefing_ids: ["code-2026-11-11", "code-2026-11-12"]
 ---
