@@ -8,11 +8,11 @@ source:
   url: "https://teach.dlut.edu.cn/ny.jsp?urltype=news.NewsContentUrl&wbnewsid=18228&wbtreeid=1016"
 authors: []
 source_published_at: "2026-10-25T00:00:00+08:00"
-retrieved_at: "2026-11-17T03:30:00.959207+08:00"
+retrieved_at: "2026-11-18T03:30:00.983479+08:00"
 published_at: "2026-11-08T03:30:13.213479+08:00"
-summary: "请课程负责人及相关教师按通知报送优质课程资源以上线国家高等教育智慧教育平台，截止时间以通知为准。"
+summary: "请相关教师按通知报送优质课程资源以上线国家高等教育智慧教育平台。"
 why_it_matters: null
-tags: []
+tags: ["教学通知"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17"]
+briefing_ids: ["resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18"]
 ---
