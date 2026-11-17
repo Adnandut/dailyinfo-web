@@ -14,5 +14,5 @@ summary: "请相关学院和科研人员按通知组织申报2026年大连市科
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17"]
+briefing_ids: ["resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17"]
 ---

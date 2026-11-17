@@ -15,5 +15,5 @@ summary: "面向 Wan 系列视频生成模型的 Gradio 一键部署界面，提
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
 ---

@@ -15,5 +15,5 @@ summary: "提供符合SimReady规范的物理精确3D资产，加速Omniverse、
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
 ---

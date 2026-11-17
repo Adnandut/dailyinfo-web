@@ -15,5 +15,5 @@ summary: "面向模型训练与对齐的成对数据资源，便于构建指令�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14"]
 ---

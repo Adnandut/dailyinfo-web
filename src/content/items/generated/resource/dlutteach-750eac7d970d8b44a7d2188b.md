@@ -14,5 +14,5 @@ summary: "请课程负责人及相关教师按通知报送优质课程资源以�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17"]
+briefing_ids: ["resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17"]
 ---

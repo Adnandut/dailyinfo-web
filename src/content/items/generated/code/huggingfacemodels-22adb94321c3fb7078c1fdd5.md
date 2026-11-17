@@ -15,5 +15,5 @@ summary: "idol图生3D模型，可从单张图像重建3D资产，服务游戏�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
 ---

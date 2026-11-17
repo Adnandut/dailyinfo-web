@@ -14,5 +14,5 @@ summary: "请相关教师按通知要求申报2026年大连市科技创新基金
 why_it_matters: null
 tags: ["科研项目申报"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16"]
+briefing_ids: ["resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16"]
 ---

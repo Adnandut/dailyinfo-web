@@ -15,5 +15,5 @@ summary: "Qwen3.8-27B多模态大模型，支持图文理解与文本生成，�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
 ---

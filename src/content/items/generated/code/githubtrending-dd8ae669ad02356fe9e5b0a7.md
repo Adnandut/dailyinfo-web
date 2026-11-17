@@ -15,5 +15,5 @@ summary: "为AI编码智能体提供生产级工程技能集合，提升其真�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-12", "code-2026-11-13"]
+briefing_ids: ["code-2026-11-12", "code-2026-11-13"]
 ---

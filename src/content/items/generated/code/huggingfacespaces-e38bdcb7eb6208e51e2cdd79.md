@@ -15,5 +15,5 @@ summary: "将 lm-evaluation-harness 的评测结果整合为可视化排行榜�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
 ---

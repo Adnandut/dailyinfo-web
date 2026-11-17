@@ -14,5 +14,5 @@ summary: "请符合条件的青年科研人员按通知申请2027年国家自然
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-11", "resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17"]
+briefing_ids: ["resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17"]
 ---

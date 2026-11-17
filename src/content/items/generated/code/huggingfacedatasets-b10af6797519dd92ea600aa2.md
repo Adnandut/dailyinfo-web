@@ -15,5 +15,5 @@ summary: "汇集基于Three.js的3D场景示例与资源，帮助开发者快速
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-11", "code-2026-11-13", "code-2026-11-14", "code-2026-11-16"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16"]
 ---
