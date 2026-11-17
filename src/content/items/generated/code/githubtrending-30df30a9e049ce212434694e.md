@@ -9,11 +9,11 @@ source:
   external_id: "google-research/paper-orchestra"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:00.990505+08:00"
+retrieved_at: "2026-11-18T03:45:01.133936+08:00"
 published_at: "2026-11-17T03:45:34.758541+08:00"
-summary: "多 Agent 框架，用于自动化撰写 AI 研究论文。"
+summary: "PaperOrchestra 是 Google Research 的多 Agent 框架，用于自动化 AI 研究论文写作，协同完成从研究到成稿的论文生产流程。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17"]
+briefing_ids: ["code-2026-11-17", "code-2026-11-18"]
 ---

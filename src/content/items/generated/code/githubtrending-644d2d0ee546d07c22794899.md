@@ -9,11 +9,11 @@ source:
   external_id: "getarcaneapp/arcane"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:00.990505+08:00"
+retrieved_at: "2026-11-18T03:45:01.133936+08:00"
 published_at: "2026-11-17T03:45:34.758541+08:00"
-summary: "现代化 Docker 管理平台，面向所有人简化容器与镜像的部署、监控和运维。"
+summary: "Arcane 是面向所有人设计的现代 Docker 管理工具，用更直观的方式简化容器环境的管理与运维。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17"]
+briefing_ids: ["code-2026-11-17", "code-2026-11-18"]
 ---

@@ -9,11 +9,11 @@ source:
   external_id: "DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NEO-CODER-MAX-MTP-GGUF"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:10.403637+08:00"
+retrieved_at: "2026-11-18T03:45:13.790457+08:00"
 published_at: "2026-10-27T03:45:47.117722+08:00"
-summary: "基于Qwen3.8-27B的免审查多模态微调模型，融合TURBO、Fable、Heretic与CODER等特性，主打高自由度图文生成和代码任务。"
+summary: "DavidAU 打造的 Qwen3.8-27B 超级融合 GGUF 模型，集成 Turbo、Heretic、NEO-CODER 等多项调优以追求极致多模态表现。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
 ---

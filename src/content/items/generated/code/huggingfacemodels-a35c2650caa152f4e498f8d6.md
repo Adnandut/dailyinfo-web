@@ -9,11 +9,11 @@ source:
   external_id: "deepseek-ai/DeepSeek-V4.1-Flash-1017"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:10.403637+08:00"
+retrieved_at: "2026-11-18T03:45:13.790457+08:00"
 published_at: "2026-10-18T03:45:42.777407+08:00"
-summary: "DeepSeek-V4.1-Flash多模态模型，主打高速图文理解与推理，兼顾性能与成本。"
+summary: "DeepSeek V4.1 Flash 多模态模型，以 Flash 系列的高效推理定位处理图像-文本理解任务。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
 ---

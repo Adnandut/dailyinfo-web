@@ -9,11 +9,11 @@ source:
   external_id: "Comfy-Org/MiniMax-H3-Image"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:10.403637+08:00"
+retrieved_at: "2026-11-18T03:45:13.790457+08:00"
 published_at: "2026-11-13T08:38:21.049658+08:00"
-summary: "MiniMax-H3-Image的ComfyUI适配版本，便于在ComfyUI工作流中直接调用文生图能力。"
+summary: "Comfy-Org 适配的 MiniMax-H3-Image 文生图工作流版本，266 万下载量体现其在 ComfyUI 生态中的高集成度。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
 ---

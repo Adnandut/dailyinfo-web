@@ -9,11 +9,11 @@ source:
   external_id: "unsloth/Qwen3.8-27B-GGUF"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:10.403637+08:00"
+retrieved_at: "2026-11-18T03:45:13.790457+08:00"
 published_at: "2026-11-13T08:38:21.049658+08:00"
-summary: "Qwen3.8-27B的GGUF量化版本，降低显存门槛，便于本地CPU/GPU高效推理。"
+summary: "Qwen3.8-27B 的 GGUF 量化版本，由 Unsloth 优化，大幅降低本地部署门槛并保留强劲多模态性能。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
 ---

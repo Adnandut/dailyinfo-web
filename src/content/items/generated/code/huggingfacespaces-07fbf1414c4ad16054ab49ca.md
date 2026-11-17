@@ -9,11 +9,11 @@ source:
   external_id: "PrunaAI/P-H3-Image"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:28.180587+08:00"
+retrieved_at: "2026-11-18T03:45:38.317633+08:00"
 published_at: "2026-11-10T03:45:50.863188+08:00"
-summary: "经 Pruna 压缩加速的图像生成模型演示，在保持画质的同时显著提升推理效率与部署经济性。"
+summary: "展示 PrunaAI 对 H3 图像模型的推理优化与加速，在保持生成质量的同时提升运行效率。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
 ---

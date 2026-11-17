@@ -9,11 +9,11 @@ source:
   external_id: "nvidia/simready-assets"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:20.530625+08:00"
+retrieved_at: "2026-11-18T03:45:21.699277+08:00"
 published_at: "2026-10-25T03:45:44.605905+08:00"
-summary: "提供符合SimReady规范的物理精确3D资产，加速Omniverse、机器人仿真与合成数据工作流。"
+summary: "NVIDIA SimReady 仿真就绪3D资产库，为数字孪生、机器人仿真和 Omniverse 场景提供带物理属性的标准化模型。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
 ---
