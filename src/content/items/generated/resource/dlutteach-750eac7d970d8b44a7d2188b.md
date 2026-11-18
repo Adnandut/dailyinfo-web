@@ -14,5 +14,5 @@ summary: "请相关教师按通知报送优质课程资源以上线国家高等�
 why_it_matters: null
 tags: ["教学通知"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18"]
+briefing_ids: ["resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18"]
 ---

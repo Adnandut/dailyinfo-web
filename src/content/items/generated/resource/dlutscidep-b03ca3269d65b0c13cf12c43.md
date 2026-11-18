@@ -14,5 +14,5 @@ summary: "请符合条件的科研人员按通知申报2026年大连市科技创
 why_it_matters: null
 tags: ["科研项目申报"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-12", "resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18"]
+briefing_ids: ["resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18"]
 ---
