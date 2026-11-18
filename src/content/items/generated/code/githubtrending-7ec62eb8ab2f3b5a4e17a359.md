@@ -9,11 +9,11 @@ source:
   external_id: "DeanChensj/jiangshan-map"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-17T03:45:00.990505+08:00"
+retrieved_at: "2026-11-19T03:46:46.429119+08:00"
 published_at: "2026-11-17T03:45:34.758541+08:00"
-summary: "中国历史交互地图时间轴，覆盖 18 个朝代、198 个疆域快照，并呈现古今地名沿革与古典诗词路线。"
+summary: "中国历史交互地图时间轴，覆盖公元前 403 年至今、18 个朝代、198 个疆域快照，并融合地名沿革与古典诗词路线。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17"]
+briefing_ids: ["code-2026-11-17", "code-2026-11-19"]
 ---

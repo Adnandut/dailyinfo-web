@@ -9,11 +9,11 @@ source:
   external_id: "n4ze3m/tiny-voca"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-18T03:45:13.790457+08:00"
+retrieved_at: "2026-11-19T03:47:01.321606+08:00"
 published_at: "2026-11-18T03:45:52.649993+08:00"
-summary: "n4ze3m 推出的微型文本转语音模型 tiny-voca，以极小体积实现轻量级 TTS 推理。"
+summary: "轻量级文本转语音模型，主打小巧高效的语音合成与本地部署。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
 ---

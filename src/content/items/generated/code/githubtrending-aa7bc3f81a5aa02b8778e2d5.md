@@ -9,11 +9,11 @@ source:
   external_id: "cursor/plugins"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-18T03:45:01.133936+08:00"
+retrieved_at: "2026-11-19T03:46:46.429119+08:00"
 published_at: "2026-10-02T05:31:00.047781+08:00"
-summary: "cursor/plugins 提供 Cursor 插件规范与官方插件，为扩展和集成 Cursor 的 AI 编程能力建立标准化入口。"
+summary: "提供 Cursor 插件规范与官方插件集合，便于扩展和统一 Cursor 编辑器能力。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
 ---

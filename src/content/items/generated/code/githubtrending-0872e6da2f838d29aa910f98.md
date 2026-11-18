@@ -9,11 +9,11 @@ source:
   external_id: "affaan-m/ECC"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-18T03:45:01.133936+08:00"
+retrieved_at: "2026-11-19T03:46:46.429119+08:00"
 published_at: "2026-10-04T03:46:51.282722+08:00"
-summary: "ECC 是 Agent harness 性能优化系统，为 Claude Code、Codex、Opencode、Cursor 等提供技能、本能、记忆、安全与研究优先的开发能力。"
+summary: "面向 Claude Code、Codex、Opencode、Cursor 等的 Agent 运行框架性能优化系统，整合技能、本能、记忆、安全与研究优先开发。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
 ---

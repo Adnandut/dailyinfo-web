@@ -9,11 +9,11 @@ source:
   external_id: "hugging-apps/bfs-best-face-swap"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-18T03:45:38.317633+08:00"
+retrieved_at: "2026-11-19T03:47:27.088703+08:00"
 published_at: "2026-10-08T03:46:20.241478+08:00"
-summary: "提供高质量人脸替换的 Gradio 应用，支持图片换脸并尽量保持身份与画面自然度。"
+summary: "高人气Gradio人脸替换应用，提供简单易用的图像换脸体验。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18", "code-2026-11-19"]
 ---

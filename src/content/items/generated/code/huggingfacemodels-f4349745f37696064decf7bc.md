@@ -9,11 +9,11 @@ source:
   external_id: "sensenova/SenseNova-Loop-9B"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-18T03:45:13.790457+08:00"
+retrieved_at: "2026-11-19T03:47:01.321606+08:00"
 published_at: "2026-11-18T03:45:52.649993+08:00"
-summary: "SenseNova 的 Loop-9B 多模态模型，采用循环架构探索图像-文本理解中的迭代推理新范式。"
+summary: "商汤9B级Loop多模态图文模型，面向图像文本理解与循环推理增强。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
 ---

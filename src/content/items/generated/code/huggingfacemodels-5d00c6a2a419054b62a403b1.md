@@ -9,11 +9,11 @@ source:
   external_id: "meituan-longcat/LongCat-Video-Avatar-1.6"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-18T03:45:13.790457+08:00"
+retrieved_at: "2026-11-19T03:47:01.321606+08:00"
 published_at: "2026-11-18T03:45:52.649993+08:00"
-summary: "美团 LongCat 推出的视频数字人头像模型 1.6 版，专注于音频驱动的高保真虚拟形象视频生成。"
+summary: "LongCat视频数字人模型1.6版，面向数字人视频生成与表情口型驱动。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
 ---

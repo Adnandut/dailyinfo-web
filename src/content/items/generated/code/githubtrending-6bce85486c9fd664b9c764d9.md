@@ -9,11 +9,11 @@ source:
   external_id: "nvm-sh/nvm"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-13T08:37:46.646610+08:00"
+retrieved_at: "2026-11-19T03:46:46.429119+08:00"
 published_at: "2026-10-15T03:49:42.170976+08:00"
-summary: "POSIX兼容的Node.js版本管理脚本，可在多个Node.js版本间灵活切换。"
+summary: "POSIX 兼容的 Node.js 版本管理器，用 Bash 脚本在多个活跃 Node 版本间灵活切换。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13"]
+briefing_ids: ["code-2026-11-13", "code-2026-11-19"]
 ---
