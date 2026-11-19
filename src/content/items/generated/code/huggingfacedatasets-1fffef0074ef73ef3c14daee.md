@@ -9,11 +9,11 @@ source:
   external_id: "google/multimodal-knowledge-agent"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-18T03:45:21.699277+08:00"
+retrieved_at: "2026-11-20T03:45:20.760953+08:00"
 published_at: "2026-11-17T03:45:34.758541+08:00"
-summary: "多模态知识智能体，融合文本与图像等信息完成知识检索、推理与问答。"
+summary: "多模态知识智能体项目，融合视觉与文本信息以进行知识检索和推理问答。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-17", "code-2026-11-18", "code-2026-11-20"]
 ---

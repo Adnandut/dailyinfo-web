@@ -9,11 +9,11 @@ source:
   external_id: "huggingface/moe-blogpost"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-19T03:47:27.088703+08:00"
+retrieved_at: "2026-11-20T03:45:26.107935+08:00"
 published_at: "2026-11-07T03:45:56.495059+08:00"
-summary: "以Docker部署的Mixture-of-Experts技术博客与交互演示，直观展示MoE路由机制和专家协作原理。"
+summary: "以可部署的 Docker 形式呈现混合专家（MoE）技术博客，系统解析稀疏路由、专家激活与工程实践，降低 MoE 的理解与复现门槛。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---

@@ -9,11 +9,11 @@ source:
   external_id: "maxwell-model/Maxwell-V1-Flash"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-19T03:47:01.321606+08:00"
+retrieved_at: "2026-11-20T03:45:10.738112+08:00"
 published_at: "2026-11-18T03:45:52.649993+08:00"
-summary: "Maxwell-V1-Flash文本生成模型，主打快速推理与高效通用文本生成。"
+summary: "Maxwell-V1-Flash 文本生成模型，主打快速推理与高效通用文本生成。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---

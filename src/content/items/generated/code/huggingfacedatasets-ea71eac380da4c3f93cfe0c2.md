@@ -9,11 +9,11 @@ source:
   external_id: "HuggingFaceFW/fineweb"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-19T03:47:16.881637+08:00"
+retrieved_at: "2026-11-20T03:45:20.760953+08:00"
 published_at: "2026-11-19T03:47:39.415378+08:00"
-summary: "HuggingFaceFW发布的大规模高质量网页文本语料，广泛用于大语言模型预训练与数据清洗研究。"
+summary: "大规模高质量网页文本数据集，为预训练语言模型提供开放、可扩展的语料基础。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20"]
 ---

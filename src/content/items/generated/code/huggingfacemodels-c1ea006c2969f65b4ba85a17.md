@@ -9,11 +9,11 @@ source:
   external_id: "Edge0/Edge0-145B-NVFP4"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-19T03:47:01.321606+08:00"
+retrieved_at: "2026-11-20T03:45:10.738112+08:00"
 published_at: "2026-11-16T03:45:40.709758+08:00"
-summary: "Edge0-145B的NVFP4量化文本生成模型，面向超大规模模型的高效低精度推理。"
+summary: "Edge0-145B 采用 NVFP4 量化的文本生成大模型，聚焦超大规模模型的高效低精度部署。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-18", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---

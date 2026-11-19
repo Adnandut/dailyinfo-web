@@ -9,11 +9,11 @@ source:
   external_id: "nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-4GB"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-19T03:47:01.321606+08:00"
+retrieved_at: "2026-11-20T03:45:10.738112+08:00"
 published_at: "2026-10-30T03:45:44.310742+08:00"
-summary: "NVIDIA Nemotron 3.5 Bolt E4B 4GB文本生成模型，主打4GB级显存可部署的高效推理。"
+summary: "英伟达 Nemotron 3.5 Bolt 4GB 文本生成模型，主打 4GB 级低显存部署与高效推理。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20"]
 ---

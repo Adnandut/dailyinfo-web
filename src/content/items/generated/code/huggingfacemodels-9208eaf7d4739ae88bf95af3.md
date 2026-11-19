@@ -9,11 +9,11 @@ source:
   external_id: "Qwen/Qwen3.8-27B"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-19T03:47:01.321606+08:00"
+retrieved_at: "2026-11-20T03:45:10.738112+08:00"
 published_at: "2026-10-01T08:19:18.900600+08:00"
-summary: "Qwen3.8-27B多模态图文理解模型，支持复杂图像文本联合推理并具备广泛部署基础。"
+summary: "Qwen3.8-27B 多模态图文理解大模型，以 27B 规模提供强图文问答与跨模态推理，下载量领先。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---
