@@ -97,6 +97,17 @@ jobs:
         with:
           path: dist
 
+      - name: Post English digest to Discord (category channels)
+        if: success()
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_PAPERS: ${{ secrets.DISCORD_WEBHOOK_PAPERS }}
+          DISCORD_WEBHOOK_ARXIV: ${{ secrets.DISCORD_WEBHOOK_ARXIV }}
+          DISCORD_WEBHOOK_AI_NEWS: ${{ secrets.DISCORD_WEBHOOK_AI_NEWS }}
+          DISCORD_WEBHOOK_CODE: ${{ secrets.DISCORD_WEBHOOK_CODE }}
+          DISCORD_WEBHOOK_RESOURCE: ${{ secrets.DISCORD_WEBHOOK_RESOURCE }}
+        run: node scripts/discord-digest.mjs
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
