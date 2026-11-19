@@ -15,5 +15,5 @@ summary: "使用 Zig 构建、支持 Metal、CUDA 和 Vulkan 的 LLM 推理引�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-15"]
+briefing_ids: ["code-2026-11-15"]
 ---

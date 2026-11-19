@@ -15,5 +15,5 @@ summary: "腾讯基于Qwen3.8-27B推出的DSpine-b16文本生成变体，探索2
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-14"]
 ---

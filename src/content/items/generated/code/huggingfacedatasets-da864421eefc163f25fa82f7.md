@@ -15,5 +15,5 @@ summary: "面向宣传与说服性文本识别的评测基准，用于衡量模�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-14"]
 ---

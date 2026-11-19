@@ -15,5 +15,5 @@ summary: "中交四航局第三工程有限公司 — 2027年校园招聘（具�
 why_it_matters: null
 tags: ["校园招聘"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-13", "resource-2026-11-14"]
+briefing_ids: ["resource-2026-11-14"]
 ---

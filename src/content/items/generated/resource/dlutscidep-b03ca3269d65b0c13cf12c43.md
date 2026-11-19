@@ -14,5 +14,5 @@ summary: "请符合条件的科研人员按通知要求申报2026年大连市科
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-13", "resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19"]
+briefing_ids: ["resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19"]
 ---

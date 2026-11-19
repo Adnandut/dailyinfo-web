@@ -15,5 +15,5 @@ summary: "HyperFlow H3 Flash多模态视频生成模型，支持图像加文本�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-14"]
 ---

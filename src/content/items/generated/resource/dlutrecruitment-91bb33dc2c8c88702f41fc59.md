@@ -15,5 +15,5 @@ summary: "东莞市步步高实验幼儿园 — 2027年校园招聘（具体岗�
 why_it_matters: null
 tags: ["校园招聘"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-13", "resource-2026-11-14"]
+briefing_ids: ["resource-2026-11-14"]
 ---

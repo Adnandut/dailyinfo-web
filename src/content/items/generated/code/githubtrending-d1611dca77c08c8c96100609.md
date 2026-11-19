@@ -15,5 +15,5 @@ summary: "OpenAI推出的Codex Security CLI与TypeScript SDK，用于发现、�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-13", "code-2026-11-14"]
+briefing_ids: ["code-2026-11-14"]
 ---
