@@ -545,6 +545,9 @@ function searchCommand(corpus, query) {
 const papersDir = join(repo, 'runtime/papers');
 const FETCH_TARGETS = 5;
 const FETCH_TIMEOUT_MS = 45_000;
+// Large open-access PDFs (10MB+) through a proxy need far more than the
+// metadata timeout — a timeout here used to look like "paywalled".
+const PDF_TIMEOUT_MS = Number(process.env.BOT_PDF_TIMEOUT_MS) || 240_000;
 const SUMMARY_CHUNK_CHARS = 3200;
 const SUMMARY_MAX_CHUNKS = 14;
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) DailyInfoBot/1.0';
@@ -814,7 +817,7 @@ async function findOpenPdf(paper) {
         const response = await fetch(url, {
           headers: { 'User-Agent': BROWSER_UA },
           redirect: 'follow',
-          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+          signal: AbortSignal.timeout(PDF_TIMEOUT_MS),
         });
         if (!response.ok) continue;
         const buffer = Buffer.from(await response.arrayBuffer());
@@ -1002,26 +1005,32 @@ async function fetchCommand(corpus, rawArgument) {
     candidates = await resolvePaperUrl(argument);
   } else if (/^10\.\d{4,9}\//.test(argument)) {
     candidates = [await resolveDoi(argument)];
-    } else {
-      const [arxiv, s2, crossref] = await Promise.all([
-        searchArxiv(argument).catch(() => []),
-        searchSemanticScholar(argument).catch(() => []),
-        searchCrossref(argument).catch(() => []),
-      ]);
-      candidates = mergeCandidates([crossref, s2, arxiv]);
-      if (!candidates.length) {
-        // Brand-new papers are often not indexed by the search APIs yet, but
-        // your own DailyInfo corpus already tracks them Ã¢â‚¬â€ use its source link.
-        // Same relevance gate as auto-pick: a single shared keyword is not a
-        // match, otherwise a stray dataset item gets fetched instead.
-        const localMatch = search(corpus, normalizeSearchQuery(argument))
+      } else {
+        const [arxiv, s2, crossref] = await Promise.all([
+          searchArxiv(argument).catch(() => []),
+          searchSemanticScholar(argument).catch(() => []),
+          searchCrossref(argument).catch(() => []),
+        ]);
+        candidates = mergeCandidates([crossref, s2, arxiv]);
+
+        // The corpus is the user's primary reading list: a strong title match
+        // there becomes a candidate EVEN when the web search found other
+        // things (junk web results must not crowd out the paper the user is
+        // actually reading from the daily feed). Same 55% relevance gate as
+        // auto-pick — a single shared keyword is not a match.
+        const corpusMatch = search(corpus, normalizeSearchQuery(argument))
           .find((item) => item.sourceUrl && relevanceScore({ title: item.title }, argument) >= 0.55);
-        if (localMatch) {
-          console.log(`[agent] not indexed by the search APIs yet Ã¢â‚¬â€ found it in your corpus: [${localMatch.category}/${localMatch.id}] (${localMatch.title})`);
-          candidates = await resolvePaperUrl(localMatch.sourceUrl);
+        if (corpusMatch) {
+          console.log(`[agent] corpus match: [${corpusMatch.category}/${corpusMatch.id}] — resolving its source…`);
+          try {
+            const resolved = await resolvePaperUrl(corpusMatch.sourceUrl);
+            resolved.forEach((paper) => { paper.provider = 'DailyInfo corpus'; });
+            candidates = mergeCandidates([resolved, candidates]);
+          } catch (error) {
+            console.error(`[agent] corpus source link unusable (${error.message}) — continuing with web results.`);
+          }
         }
       }
-    }
     if (!candidates.length) {
       console.log(`\nNothing found for "${argument}". Try a shorter keyword set or an exact title in quotes.`);
       return;
