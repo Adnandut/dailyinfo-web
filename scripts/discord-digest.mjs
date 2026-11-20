@@ -223,28 +223,47 @@ async function botApi(method, path, payload) {
  * message in the channel + a THREAD attached to it, with every item as its
  * own message inside the thread. Channel → "1 post, all items inside".
  */
-async function postCategoryViaBot(webhookInfo, items, pageUrl, category, date, total) {
-  const channel = webhookInfo.channel_id;
-  const header = await botApi('POST', `/channels/${channel}/messages`, {
-    embeds: [{
-      title: clip(`${category.label} — ${date}`, 250),
-      url: pageUrl,
-      description: `${total} articles today · all items in the thread below. Full edition: **${pageUrl}**`,
-      color: 0x2b6cb0,
-      footer: { text: 'DailyInfo English edition' },
-    }],
-  });
-  const thread = await botApi('POST', `/channels/${channel}/messages/${header.id}/threads`, {
-    name: clip(`${category.label} — ${date}`, 100),
-  });
+/** Pack items into thread-message texts (≤ ~1850 chars): numbered bold titles
+ * + "> summary", like "【Part 16/22】" — the format of the Chinese daily bot. */
+function packTextParts(items) {
+  const parts = [];
+  let current = '';
   for (const [index, item] of items.entries()) {
-    await botApi('POST', `/channels/${thread.id}/messages`, {
-      embeds: [itemEmbed(item, index + 1, total, pageUrl, category.label, date)],
-    });
-    await sleep(POST_GAP_THREAD_MS);
+    const line = `${index + 1}. **${clip(item.title, 250)}**`
+      + (item.summary ? `\n   > ${clip(item.summary, 400)}` : '');
+    const candidate = current ? `${current}\n\n${line}` : line;
+    if (candidate.length > 1850) {
+      parts.push(current);
+      current = line;
+    } else {
+      current = candidate;
+    }
   }
-  return { threadId: thread.id, messages: items.length + 1 };
+  if (current) parts.push(current);
+  return parts.map((part, index) => `【Part ${index + 1}/${parts.length}】\n\n${part}`);
 }
+
+async function postCategoryViaBot(webhookInfo, items, pageUrl, category, date, total) {
+    const channel = webhookInfo.channel_id;
+    const header = await botApi('POST', `/channels/${channel}/messages`, {
+      embeds: [{
+        title: clip(`${category.label} — ${date}`, 250),
+        url: pageUrl,
+        description: `${total} articles today · all items in the thread below. Full edition: **${pageUrl}**`,
+        color: 0x2b6cb0,
+        footer: { text: 'DailyInfo English edition' },
+      }],
+    });
+    const thread = await botApi('POST', `/channels/${channel}/messages/${header.id}/threads`, {
+      name: clip(`${category.label} — ${date}`, 100),
+    });
+    const parts = packTextParts(items);
+    for (const part of parts) {
+      await botApi('POST', `/channels/${thread.id}/messages`, { content: part });
+      await sleep(POST_GAP_THREAD_MS);
+    }
+    return { threadId: thread.id, messages: parts.length };
+  }
 
 function readMarker() {
   try {
