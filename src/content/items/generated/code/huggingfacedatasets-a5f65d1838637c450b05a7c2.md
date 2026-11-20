@@ -15,5 +15,5 @@ summary: "NVIDIA SimReady标准化3D资产库，提供带物理属性的仿真�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---

@@ -15,5 +15,5 @@ summary: "Kimi-K3.1-Pro多模态大模型，强化图文理解与复杂推理，
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
 ---

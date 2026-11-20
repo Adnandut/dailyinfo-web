@@ -15,5 +15,5 @@ summary: "界面精美、可自托管的网站与服务监控工具。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-15"]
+briefing_ids: ["code-2026-11-15"]
 ---

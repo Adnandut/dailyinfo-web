@@ -15,5 +15,5 @@ summary: "Gemma-4-31B 指令微调的 ARA/Heretic 无审查 GGUF 量化版，面
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-16"]
+briefing_ids: ["code-2026-11-16"]
 ---

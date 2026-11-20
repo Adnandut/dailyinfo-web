@@ -14,5 +14,5 @@ summary: "请符合条件的青年科研人员按通知申请国家自然科学�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-14", "resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20"]
+briefing_ids: ["resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20"]
 ---

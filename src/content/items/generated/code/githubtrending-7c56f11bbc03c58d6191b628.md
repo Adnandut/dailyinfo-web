@@ -15,5 +15,5 @@ summary: "modern-web-guidance-src 为编码 Agent 提供最新 Web 最佳实践�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-15", "code-2026-11-16"]
+briefing_ids: ["code-2026-11-15", "code-2026-11-16"]
 ---

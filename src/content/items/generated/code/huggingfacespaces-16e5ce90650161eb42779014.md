@@ -15,5 +15,5 @@ summary: "基于 Wan 视频生成模型的 Gradio 演示，支持文本或图像
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
 ---

@@ -15,5 +15,5 @@ summary: "Wan2.2 视频生成模型的 FP8/AOTI 优化预览版 Gradio 应用，
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-14", "code-2026-11-16"]
+briefing_ids: ["code-2026-11-16"]
 ---
