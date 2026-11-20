@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 /**
- * Post the latest English daily digest to Discord, category by category.
+ * Post the latest English daily digest to Discord, category by category,
+ * ONE MESSAGE PER ITEM (separate posts, as the channels are meant to read
+ * like a feed). A short header message links to the /en/ page.
  *
  * One webhook per category (env: DISCORD_WEBHOOK_PAPERS, DISCORD_WEBHOOK_ARXIV,
  * DISCORD_WEBHOOK_AI_NEWS, DISCORD_WEBHOOK_CODE, DISCORD_WEBHOOK_RESOURCE —
  * locally via .env, in CI via repository secrets).
  *
- * Reads the newest translated day from runtime/bot-cache/en/ and posts one
- * compact embed per category (top headlines + link to the /en/ page). A
- * marker file (runtime/bot-cache/.discord-posted.json) records which
- * categories were already posted per date so repeated deploys do not spam
- * the channels; when upstream publishes a later wave for the same date, the
- * new categories still go out.
+ * Reads the newest translated day from runtime/bot-cache/en/. A marker file
+ * (runtime/bot-cache/.discord-posted.json) records which categories were
+ * already posted per date so repeated deploys do not spam the channels; when
+ * upstream publishes a later wave for the same date, the new categories
+ * still go out.
  *
  * Usage:
  *   node scripts/discord-digest.mjs                 # latest date, respect marker
@@ -19,6 +20,9 @@
  *   node scripts/discord-digest.mjs --force         # ignore the marker
  *   node scripts/discord-digest.mjs --only papers   # one category
  *   node scripts/discord-digest.mjs --dry           # print, do not POST
+ *
+ * Item volume: DISCORD_MAX_ITEMS (default 10) per category per day — the
+ * channel stays a feed, not a firehose; the header links to the full page.
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -43,15 +47,15 @@ const WEBHOOK_ENV = {
   code: 'DISCORD_WEBHOOK_CODE',
   resource: 'DISCORD_WEBHOOK_RESOURCE',
 };
-const HEADLINE_COUNT = 5;
-const HEADLINE_CHARS = 160;
+const MAX_ITEMS = Number(process.env.DISCORD_MAX_ITEMS) || 10;
+const ITEM_SUMMARY_CHARS = 500;
+const POST_GAP_MS = 700;
 
 const args = process.argv.slice(2);
 const dry = args.includes('--dry');
 const force = args.includes('--force');
-const onlyArg = args.find((arg) => arg.startsWith('--only'))?.split('=')[1]
-  ?? (args[args.indexOf('--only') + 1] && !args[args.indexOf('--only') + 1].startsWith('--')
-    ? args[args.indexOf('--only') + 1] : '');
+const onlyIndex = args.indexOf('--only');
+const onlyArg = onlyIndex !== -1 ? (args[onlyIndex + 1] ?? '') : '';
 const dateArg = args.find((arg) => /^\d{4}-\d{2}-\d{2}$/.test(arg)) ?? '';
 
 function parseDocument(text) {
@@ -63,44 +67,68 @@ function cleanMarkdown(text) {
   return String(text)
     .replaceAll(/\[([^\]]+)\]\([^)]*\)/g, '$1')
     .replaceAll(/\*\*/g, '')
+    .replaceAll(/&lt;/g, '<').replaceAll(/&gt;/g, '>').replaceAll(/&amp;/g, '&')
     .replaceAll(/\s+/g, ' ')
     .trim();
 }
 
-function extractHeadlines(body) {
-  const headlines = [];
-  for (const line of body.split(/\r?\n/)) {
-    const numbered = line.match(/^\s*\d+\.\s+\*\*(.+?)\*\*/);
-    const dated = line.match(/^\s*\*\*\[\d{4}-\d{2}-\d{2}\]\s*(.+?)\*\*/);
-    const raw = numbered?.[1] ?? dated?.[1];
-    if (!raw) continue;
-    const title = cleanMarkdown(raw).slice(0, HEADLINE_CHARS);
-    if (title && !headlines.includes(title)) headlines.push(title);
-    if (headlines.length >= HEADLINE_COUNT) break;
+/** Numbered items with a following "> summary" line — the digest format. */
+function extractItems(body) {
+  const items = [];
+  const lines = body.split(/\r?\n/);
+  for (let index = 0; index < lines.length; index++) {
+    const titleMatch = lines[index].match(/^\s*\d+\.\s+\*\*(.+?)\*\*\s*$/);
+    if (!titleMatch) continue;
+    let summary = '';
+    for (let next = index + 1; next < Math.min(index + 3, lines.length); next++) {
+      const quote = lines[next].match(/^\s*>\s+(.+)$/);
+      if (quote) { summary = cleanMarkdown(quote[1]); break; }
+      if (lines[next].trim()) break;
+    }
+    const title = cleanMarkdown(titleMatch[1]);
+    if (title && !items.some((item) => item.title === title)) {
+      items.push({ title, summary });
+    }
   }
-  return headlines;
+  return items;
+}
+
+function clip(text, limit) {
+  if (!text) return '';
+  return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
 }
 
 async function postToDiscord(webhookUrl, payload) {
-  const response = await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (response.status === 429) {
-    const wait = Number(response.headers.get('retry-after') ?? 2) * 1000;
-    await new Promise((resolveDelay) => setTimeout(resolveDelay, wait));
-    const retry = await fetch(webhookUrl, {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(15_000),
     });
-    if (!retry.ok) throw new Error(`Discord webhook ${retry.status}`);
-    return;
+    if (response.ok) return;
+    if (response.status === 429 && attempt === 0) {
+      const wait = Number(response.headers.get('retry-after') ?? 2) * 1000;
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, wait));
+      continue;
+    }
+    throw new Error(`Discord webhook ${response.status}`);
   }
-  if (!response.ok) throw new Error(`Discord webhook ${response.status}`);
+}
+
+function readMarker() {
+  try {
+    return JSON.parse(readFileSync(markerPath, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function readdirDates() {
+  return readdirSync(cacheDir)
+    .filter((name) => /^\d{4}-\d{2}-\d{2}$/.test(name))
+    .sort()
+    .reverse();
 }
 
 async function main() {
@@ -130,30 +158,45 @@ async function main() {
     if (!webhookUrl) { console.log(`[discord] ${category.label}: ${WEBHOOK_ENV[category.id]} not set — skipped`); continue; }
 
     const { body } = parseDocument(readFileSync(file, 'utf8'));
-    const headlines = extractHeadlines(body);
+    const items = extractItems(body).slice(0, MAX_ITEMS);
     const pageUrl = `${SITE.publicUrl}en/${date}/${category.slug}/`;
-    const description = headlines.length
-      ? headlines.map((title, index) => `**${index + 1}.** ${title}`).join('\n').slice(0, 3900)
-      : 'See the full English digest online.';
-    const payload = {
-      username: 'DailyInfo',
-      embeds: [{
-        title: `${category.label} — ${date}`,
-        url: pageUrl,
-        description,
-        color: 0x2b6cb0,
-        footer: { text: `DailyInfo English edition · ${SITE.publicUrl}en/` },
-        timestamp: new Date().toISOString(),
-      }],
-    };
+    const total = (body.match(/^\s*\d+\.\s+\*\*/gm) ?? []).length;
 
     if (dry) {
-      console.log(`[discord] DRY ${category.label} → ${pageUrl}\n${description}\n`);
+      console.log(`[discord] DRY ${category.label}: ${items.length} item post(s) → ${pageUrl}`);
+      for (const item of items) console.log(`   • ${clip(item.title, 90)}`);
       continue;
     }
+
     try {
-      await postToDiscord(webhookUrl, payload);
-      console.log(`[discord] ${category.label}: posted ${headlines.length} headlines → ${pageUrl}`);
+      // Header message: what this feed is + where the full edition lives.
+      await postToDiscord(webhookUrl, {
+        username: 'DailyInfo',
+        embeds: [{
+          title: `${category.label} — ${date}`,
+          url: pageUrl,
+          description: `${total || items.length} articles today · posting ${items.length} highlights. Full edition: **${pageUrl}**`,
+          color: 0x2b6cb0,
+          footer: { text: 'DailyInfo English edition' },
+        }],
+      });
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, POST_GAP_MS));
+
+      // One message per item: title + its summary.
+      for (const [index, item] of items.entries()) {
+        await postToDiscord(webhookUrl, {
+          username: 'DailyInfo',
+          embeds: [{
+            title: clip(`${index + 1}. ${item.title}`, 250),
+            url: pageUrl,
+            description: clip(item.summary, ITEM_SUMMARY_CHARS) || 'See the full edition online.',
+            color: 0x4a90d9,
+            footer: { text: `DailyInfo · ${category.label} · ${date} · item ${index + 1}/${items.length}` },
+          }],
+        });
+        await new Promise((resolveDelay) => setTimeout(resolveDelay, POST_GAP_MS));
+      }
+      console.log(`[discord] ${category.label}: header + ${items.length} item posts → ${pageUrl}`);
       already.add(category.id);
       posted[date] = [...already].sort();
       postedSomething = true;
@@ -166,21 +209,6 @@ async function main() {
   if (!dry && (postedSomething || force)) {
     mkdirSync(dirname(markerPath), { recursive: true });
     writeFileSync(markerPath, `${JSON.stringify(posted, null, 2)}\n`, 'utf8');
-  }
-}
-
-function readdirDates() {
-  return readdirSync(cacheDir)
-    .filter((name) => /^\d{4}-\d{2}-\d{2}$/.test(name))
-    .sort()
-    .reverse();
-}
-
-function readMarker() {
-  try {
-    return JSON.parse(readFileSync(markerPath, 'utf8'));
-  } catch {
-    return {};
   }
 }
 
