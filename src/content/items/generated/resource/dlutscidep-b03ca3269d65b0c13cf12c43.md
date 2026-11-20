@@ -8,11 +8,11 @@ source:
   url: "https://sso.dlut.edu.cn/cas/login?service=http%3A%2F%2F202.118.69.24%2FuserAction%21do_casLogin.action"
 authors: []
 source_published_at: "2026-11-04T00:00:00+08:00"
-retrieved_at: "2026-11-20T03:30:00.888413+08:00"
+retrieved_at: "2026-11-21T03:30:01.015217+08:00"
 published_at: "2026-11-08T03:30:13.213479+08:00"
-summary: "请相关教师和科研人员按通知申报2026年大连市科技创新基金科技惠民项目，具体截止时间见通知。"
+summary: "相关教师和科研人员需按通知要求组织申报2026年大连市科技创新基金科技惠民项目。"
 why_it_matters: null
-tags: []
+tags: ["科研项目申报"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20"]
+briefing_ids: ["resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21"]
 ---
