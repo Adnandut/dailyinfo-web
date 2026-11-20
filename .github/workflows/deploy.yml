@@ -106,6 +106,7 @@ jobs:
           DISCORD_WEBHOOK_AI_NEWS: ${{ secrets.DISCORD_WEBHOOK_AI_NEWS }}
           DISCORD_WEBHOOK_CODE: ${{ secrets.DISCORD_WEBHOOK_CODE }}
           DISCORD_WEBHOOK_RESOURCE: ${{ secrets.DISCORD_WEBHOOK_RESOURCE }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: node scripts/discord-digest.mjs
 
   deploy:
