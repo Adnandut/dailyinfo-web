@@ -24,6 +24,7 @@ import { Client, GatewayIntentBits, Events } from 'discord.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { EnvHttpProxyAgent, setGlobalDispatcher } from 'undici';
 import { createJobRunner } from './agent-jobs.mjs';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -290,13 +291,17 @@ export async function agentHandle(text, io) {
 // ---------------------------------------------------------------------------
 
 function main() {
+  // REST routes via makeRequest → global fetch (env-proxy aware under
+  // --use-env-proxy). The gateway ws (Node's built-in WebSocket, undici-based)
+  // also honors the env proxy NATIVELY — notably, swapping https.globalAgent
+  // to an HttpsProxyAgent BREAKS it (probe-verified), so don't.
   if (!process.env.DISCORD_BOT_TOKEN) {
     console.error('[discord-agent] DISCORD_BOT_TOKEN is not set (.env).');
     process.exitCode = 1;
     return;
   }
   if (!OWNER_NAME && !OWNER_ID) {
-    console.error('[discord-agent] DISCORD_OWNER_NAME (or DISCORD_OWNER_ID) is not set â€” refusing to start (owner-only agent).');
+    console.error('[discord-agent] DISCORD_OWNER_NAME (or DISCORD_OWNER_ID) is not set — refusing to start (owner-only agent).');
     process.exitCode = 1;
     return;
   }
@@ -306,10 +311,26 @@ function main() {
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.MessageContent,
     ],
+    // Route discord.js REST through the env proxy (global fetch honors
+    // HTTPS_PROXY under --use-env-proxy).
+    rest: process.env.HTTPS_PROXY ? { makeRequest: (url, init) => fetch(url, init) } : {},
   });
+  // discord.js's REST construction RESETS the global undici dispatcher
+  // (agent defaults to null) — re-assert the env proxy so the gateway
+  // websocket (which uses the global dispatcher) routes through Clash too.
+  if (process.env.HTTPS_PROXY || process.env.HTTP_PROXY) {
+    setGlobalDispatcher(new EnvHttpProxyAgent());
+  }
   client.once(Events.ClientReady, () => {
-    console.log(`[discord-agent] online as ${client.user.tag} â€” owner: ${OWNER_NAME || OWNER_ID}`);
+    console.log(`[discord-agent] online as ${client.user.tag} — owner: ${OWNER_NAME || OWNER_ID}`);
   });
+  client.on(Events.ShardDisconnect, (event, shardId) => {
+    console.error(`[discord-agent] shard ${shardId} disconnected:`, JSON.stringify(event));
+  });
+  client.on(Events.ShardError, (error, shardId) => {
+    console.error(`[discord-agent] shard ${shardId} error:`, error.message);
+  });
+  client.on(Events.Debug, (message) => console.log(`[discord-agent:debug] ${message}`));
   client.on(Events.MessageCreate, async (message) => {
     try {
       if (!isOwner(message)) return;
