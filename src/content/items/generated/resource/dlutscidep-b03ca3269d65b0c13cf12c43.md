@@ -14,5 +14,5 @@ summary: "相关教师和科研人员需按通知要求组织申报2026年大连
 why_it_matters: null
 tags: ["科研项目申报"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-15", "resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21"]
+briefing_ids: ["resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21"]
 ---

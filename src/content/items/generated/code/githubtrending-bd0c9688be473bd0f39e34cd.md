@@ -15,5 +15,5 @@ summary: "通过 MCP 将 Chrome DevTools 能力提供给编码 Agent，用于浏
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-15", "code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
 ---
