@@ -85,7 +85,7 @@ function chunkText(text) {
 class DiscordIO {
   constructor(message) {
     this.message = message;
-    this.ack = null;
+    this.ackMessage = null; // NB: never name this `ack` - it shadows the ack() method
     this.thread = null;
     this.lastEdit = 0;
   }
@@ -93,27 +93,27 @@ class DiscordIO {
     return this.thread?.id ?? this.message.channel.id;
   }
   async ack(text) {
-    this.ack = await this.message.reply({ content: clip(text, MAX_MESSAGE_CHARS) });
+    this.ackMessage = await this.message.reply({ content: clip(text, MAX_MESSAGE_CHARS) });
     if (!this.message.channel.isThread()) {
       try {
-        this.thread = await this.ack.startThread({ name: clip(text, 60) || 'agent', autoArchiveDuration: 1440 });
+        this.thread = await this.ackMessage.startThread({ name: clip(text, 60) || 'agent', autoArchiveDuration: 1440 });
       } catch {
         /* thread creation is best-effort â€” replies continue in the channel */
       }
     }
-    return this.ack;
+    return this.ackMessage;
   }
   async progress(text) {
-    if (!this.ack) return;
-    if (Date.now() - this.lastEdit < PROGRESS_EDIT_MS) return this.ack;
+    if (!this.ackMessage) return;
+    if (Date.now() - this.lastEdit < PROGRESS_EDIT_MS) return this.ackMessage;
     this.lastEdit = Date.now();
     const target = this.thread ?? this.message.channel;
     try {
-      await this.ack.edit({ content: clip(text, MAX_MESSAGE_CHARS) });
+      await this.ackMessage.edit({ content: clip(text, MAX_MESSAGE_CHARS) });
     } catch {
       /* progress edits are cosmetic */
     }
-    return this.ack;
+    return this.ackMessage;
   }
   async ack0() { return this.message.reply('â³ workingâ€¦'); }
   async send(text) {
@@ -359,9 +359,10 @@ function main() {
   client.on(Events.MessageCreate, async (message) => {
     try {
       if (!isOwner(message)) return;
-      const text = message.content.trim();
+      // Strip the @mention (if any) so the intent router sees clean text.
+      const text = message.content.replace(/<@!?\d+>/g, '').trim() || message.content.trim();
       if (text.length < 2) return;
-      console.log(`[discord-agent] ${message.author.username}: ${clip(text, 100)}`);
+      console.log(`[discord-agent] ${message.author.username} in #${message.channel.name ?? 'dm'}: ${clip(text, 100)}`);
       const io = new DiscordIO(message);
       await agentHandle(text, io);
     } catch (error) {
