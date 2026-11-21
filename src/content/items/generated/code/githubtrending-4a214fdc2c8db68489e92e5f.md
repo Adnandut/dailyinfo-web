@@ -9,11 +9,11 @@ source:
   external_id: "XiaoYouChR/Ghost-Downloader-3"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-21T03:45:25.379898+08:00"
+retrieved_at: "2026-11-22T03:45:01.068861+08:00"
 published_at: "2026-11-20T03:45:36.560503+08:00"
-summary: "集多种下载能力于一体的全能下载器，提供一站式下载体验。"
+summary: "主打全能的一站式下载器，集成多种下载能力，致力于覆盖日常下载需求。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-21"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-21", "code-2026-11-22"]
 ---

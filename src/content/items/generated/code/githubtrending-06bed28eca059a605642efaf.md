@@ -9,11 +9,11 @@ source:
   external_id: "Tracer-Cloud/opensre"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-21T03:45:25.379898+08:00"
+retrieved_at: "2026-11-22T03:45:01.068861+08:00"
 published_at: "2026-11-20T03:45:36.560503+08:00"
-summary: "面向CI/CD可靠性的开源智能体，自动化保障交付流水线稳定。"
+summary: "开源CI/CD可靠性代理，用于监控、诊断和提升持续集成与持续交付流水线的稳定性。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-21"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-21", "code-2026-11-22"]
 ---

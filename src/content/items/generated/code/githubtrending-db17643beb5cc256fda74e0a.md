@@ -9,11 +9,11 @@ source:
   external_id: "openvinotoolkit/openvino"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-21T03:45:25.379898+08:00"
+retrieved_at: "2026-11-22T03:45:01.068861+08:00"
 published_at: "2026-11-19T03:47:39.415378+08:00"
-summary: "开源AI推理优化与部署工具包，加速多硬件平台上的推理落地。"
+summary: "开源AI推理优化与部署工具包，支持模型优化并在多硬件平台高效部署推理。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-21"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-21", "code-2026-11-22"]
 ---
