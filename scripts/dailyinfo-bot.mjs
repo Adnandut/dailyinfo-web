@@ -1352,4 +1352,6 @@ export {
   fetchCommand,
   searchCommand,
   getLastFetchedPaper,
+  slugifyFile,
+  chat,
 };

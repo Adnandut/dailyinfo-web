@@ -22,12 +22,14 @@
     "bot": "node --use-env-proxy --env-file-if-exists=.env scripts/dailyinfo-bot.mjs",
     "agent-ui": "node --use-env-proxy --env-file-if-exists=.env scripts/agent-server.mjs",
     "discord-digest": "node --use-env-proxy --env-file-if-exists=.env scripts/discord-digest.mjs",
+    "discord-bot": "node --use-env-proxy --env-file-if-exists=.env scripts/discord-agent.mjs",
     "ci": "npm run validate && npm run test && npm run check && npm run build"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.0",
     "@astrojs/sitemap": "^3.0.0",
     "astro": "^5.0.0",
+    "discord.js": "^14.28.1",
     "pdfjs-dist": "^6.5.438"
   },
   "devDependencies": {

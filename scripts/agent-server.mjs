@@ -13,6 +13,7 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { getLastFetchedPaper } from './dailyinfo-bot.mjs';
+import { createJobRunner } from './agent-jobs.mjs';
 import { pingZotero, saveToZoteroLocal, writeRis } from './zotero.mjs';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,70 +21,13 @@ const papersDir = join(repo, 'runtime/papers');
 const PORT = Number(process.env.AGENT_UI_PORT) || 4323;
 const HOST = '127.0.0.1';
 
-// Load the bot FRESH per job: the query-string import busts Node's module
-// cache, so code updates and newly synced corpus days apply without
-// restarting the server. (A long-lived server otherwise serves the module
-// snapshot from its first import — that once fed the page stale search code.)
-let botStamp = 0;
-async function loadBot() {
-  botStamp = Date.now();
-  return import(`./dailyinfo-bot.mjs?ts=${botStamp}`);
-}
+// Job queue shared with the Discord agent: one command at a time, console
+// output captured per job, bot module hot-reloaded fresh per job.
+const runner = createJobRunner();
 
 async function currentCorpus() {
-  const bot = await loadBot();
+  const bot = await import(`./dailyinfo-bot.mjs?ts=${Date.now()}`);
   return { bot, corpus: { items: bot.loadItems(), briefings: bot.loadBriefings() } };
-}
-
-// ---------------------------------------------------------------------------
-// Job queue: one job at a time (LLM calls are sequential anyway). Each job
-// captures its console output so the page can stream progress.
-// ---------------------------------------------------------------------------
-const jobs = new Map();
-let jobCounter = 0;
-let activeJob = null;
-const queue = [];
-
-const ORIGINAL_STDOUT_WRITE = process.stdout.write.bind(process.stdout);
-const ORIGINAL_STDERR_WRITE = process.stderr.write.bind(process.stderr);
-
-function routedWrite(original, ...args) {
-  const text = String(args[0] ?? '');
-  if (activeJob) activeJob.log.push(text);
-  original(...args);
-}
-
-function startJob(command) {
-  const job = { id: ++jobCounter, command, status: 'running', log: [], result: '', startedAt: Date.now() };
-  jobs.set(job.id, job);
-  queue.push(job);
-  pump();
-  return job;
-}
-
-function pump() {
-  if (activeJob || !queue.length) return;
-  activeJob = queue.shift();
-  const job = activeJob;
-  process.stdout.write = (...args) => routedWrite(ORIGINAL_STDOUT_WRITE, ...args);
-  process.stderr.write = (...args) => routedWrite(ORIGINAL_STDERR_WRITE, ...args);
-  // Yield first so the caller gets its jobId before work starts.
-    setTimeout(async () => {
-      try {
-        const { bot, corpus } = await currentCorpus();
-        await bot.runCommand(corpus, job.command);
-        job.status = 'done';
-      } catch (error) {
-        job.status = 'error';
-        job.result = error.message;
-      } finally {
-        ORIGINAL_STDOUT_WRITE(`[agent-ui] job ${job.id} ${job.status}\n`);
-        process.stdout.write = ORIGINAL_STDOUT_WRITE;
-        process.stderr.write = ORIGINAL_STDERR_WRITE;
-        activeJob = null;
-        pump();
-      }
-    }, 30);
 }
 
 function json(res, code, payload) {
@@ -275,8 +219,7 @@ createServer(async (req, res) => {
       const { bot, corpus } = await currentCorpus();
       json(res, 200, {
         corpus: `${corpus.items.length} items · ${corpus.briefings.length} briefings · ${bot.listDates(corpus.briefings).length} dates`,
-        busy: Boolean(activeJob),
-        queue: queue.length,
+        busy: runner.busy(),
         zotero: await pingZotero(),
       });
       return;
@@ -298,13 +241,13 @@ createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/api/job') {
       const { command } = JSON.parse(await readBody(req));
       if (typeof command !== 'string' || !command.trim()) { json(res, 400, { error: 'empty command' }); return; }
-      if (activeJob || queue.length) { json(res, 429, { error: 'another job is running — try again in a moment' }); return; }
-      const job = startJob(command.trim());
+      if (runner.busy()) { json(res, 429, { error: 'another job is running — try again in a moment' }); return; }
+      const job = runner.submit(command.trim());
       json(res, 200, { id: job.id });
       return;
     }
     if (req.method === 'GET' && url.pathname.startsWith('/api/job/')) {
-      const job = jobs.get(Number(url.pathname.split('/').pop()));
+      const job = runner.get(Number(url.pathname.split('/').pop()));
       if (!job) { json(res, 404, { error: 'unknown job' }); return; }
       json(res, 200, { id: job.id, status: job.status, log: job.log, result: job.result });
       return;
@@ -315,6 +258,6 @@ createServer(async (req, res) => {
   }
 }).listen(PORT, HOST, async () => {
   const { corpus } = await currentCorpus();
-  ORIGINAL_STDOUT_WRITE(`[agent-ui] http://${HOST}:${PORT} — corpus: ${corpus.items.length} items, ${corpus.briefings.length} briefings (hot-reloaded per job)\n`);
-  ORIGINAL_STDOUT_WRITE('[agent-ui] Ctrl+C to stop. The page talks to the same engine as the CLI.\n');
+  process.stdout.write(`[agent-ui] http://${HOST}:${PORT} — corpus: ${corpus.items.length} items, ${corpus.briefings.length} briefings (hot-reloaded per job)\n`);
+  process.stdout.write('[agent-ui] Ctrl+C to stop. The page talks to the same engine as the CLI.\n');
 });
