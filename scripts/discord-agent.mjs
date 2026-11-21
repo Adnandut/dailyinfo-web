@@ -24,7 +24,8 @@ import { Client, GatewayIntentBits, Events } from 'discord.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { EnvHttpProxyAgent, setGlobalDispatcher } from 'undici';
+import https from 'node:https';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createJobRunner } from './agent-jobs.mjs';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -290,11 +291,42 @@ export async function agentHandle(text, io) {
 // Discord gateway
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Proxy routing
+//
+// REST goes through global fetch (env-proxy aware under --use-env-proxy).
+// The gateway websocket uses the `ws` package, which is NOT proxy aware: it
+// sets opts.createConnection (overriding agents and the global dispatcher) and
+// calls https.request directly. Patching https.request to inject a proxy agent
+// (and drop createConnection) is the one hook that actually works — verified
+// against the live gateway.
+// ---------------------------------------------------------------------------
+function installProxyForWebSocket() {
+  const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
+  if (!proxy) return;
+  const agent = new HttpsProxyAgent(proxy);
+  const original = https.request;
+  https.request = function patchedRequest(...args) {
+    const first = args[0];
+    if (first && typeof first === 'object' && !(first instanceof URL)) {
+      first.agent = agent;
+      delete first.createConnection;
+    } else if (typeof first === 'string' || first instanceof URL) {
+      const second = args[1];
+      if (second && typeof second === 'object') {
+        second.agent = agent;
+        delete second.createConnection;
+      } else {
+        args.splice(1, 0, { agent });
+      }
+    }
+    return original.apply(this, args);
+  };
+  console.log(`[discord-agent] websocket traffic routed via ${proxy}`);
+}
+
 function main() {
-  // REST routes via makeRequest → global fetch (env-proxy aware under
-  // --use-env-proxy). The gateway ws (Node's built-in WebSocket, undici-based)
-  // also honors the env proxy NATIVELY — notably, swapping https.globalAgent
-  // to an HttpsProxyAgent BREAKS it (probe-verified), so don't.
+  installProxyForWebSocket();
   if (!process.env.DISCORD_BOT_TOKEN) {
     console.error('[discord-agent] DISCORD_BOT_TOKEN is not set (.env).');
     process.exitCode = 1;
@@ -315,12 +347,6 @@ function main() {
     // HTTPS_PROXY under --use-env-proxy).
     rest: process.env.HTTPS_PROXY ? { makeRequest: (url, init) => fetch(url, init) } : {},
   });
-  // discord.js's REST construction RESETS the global undici dispatcher
-  // (agent defaults to null) — re-assert the env proxy so the gateway
-  // websocket (which uses the global dispatcher) routes through Clash too.
-  if (process.env.HTTPS_PROXY || process.env.HTTP_PROXY) {
-    setGlobalDispatcher(new EnvHttpProxyAgent());
-  }
   client.once(Events.ClientReady, () => {
     console.log(`[discord-agent] online as ${client.user.tag} — owner: ${OWNER_NAME || OWNER_ID}`);
   });
@@ -330,7 +356,6 @@ function main() {
   client.on(Events.ShardError, (error, shardId) => {
     console.error(`[discord-agent] shard ${shardId} error:`, error.message);
   });
-  client.on(Events.Debug, (message) => console.log(`[discord-agent:debug] ${message}`));
   client.on(Events.MessageCreate, async (message) => {
     try {
       if (!isOwner(message)) return;
