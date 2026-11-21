@@ -36,7 +36,7 @@ import { SITE } from '../src/lib/site.ts';
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const cacheDir = join(repo, 'runtime/bot-cache/en');
 const markerPath = join(repo, 'runtime/bot-cache/.discord-posted.json');
-const PART_CHARS = 1850; // Discord plain-message limit is 2000
+const PART_CHARS = 4050; // embed description limit is 4096 — margin for the 【Part N/M】 line
 
 const CATEGORIES = [
   { id: 'papers', label: 'Papers', slug: 'papers' },
@@ -70,6 +70,11 @@ function cleanHeading(text) {
     .replaceAll(/\*\*/g, '')
     .replaceAll(/\s+/g, ' ')
     .trim();
+}
+
+function clip(text, limit) {
+  if (!text) return '';
+  return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
 }
 
 /** Each ##/### section (heading + body, structure preserved verbatim —
@@ -113,7 +118,34 @@ function packParts(sections) {
     }
   }
   if (current) parts.push(current);
-  return parts.map((part, index) => `【Part ${index + 1}/${parts.length}】\n\n${part}`);
+  return parts;
+}
+
+/** Convert content parts into embeds, then greedily pack embeds into the
+ * fewest messages: ≤10 embeds and ≤5900 chars (title+desc+footer) each. */
+function packMessages(parts, category, date, pageUrl) {
+  const embeds = parts.map((part, index) => ({
+    title: clip(`${category.label} — ${date} · Part ${index + 1}/${parts.length}`, 250),
+    url: pageUrl,
+    description: `【Part ${index + 1}/${parts.length}】\n\n${part}`,
+    color: 0x2b6cb0,
+    footer: { text: 'DailyInfo English edition' },
+  }));
+  const messages = [];
+  let current = [];
+  let chars = 0;
+  for (const embed of embeds) {
+    const cost = (embed.title?.length ?? 0) + (embed.description?.length ?? 0) + (embed.footer?.text?.length ?? 0) + 40;
+    if (current.length && (current.length >= 10 || chars + cost > 5900)) {
+      messages.push({ username: 'DailyInfo', embeds: current });
+      current = [];
+      chars = 0;
+    }
+    current.push(embed);
+    chars += cost;
+  }
+  if (current.length) messages.push({ username: 'DailyInfo', embeds: current });
+  return messages;
 }
 
 async function postToDiscord(webhookUrl, payload) {
@@ -177,21 +209,21 @@ async function main() {
 
     const { body } = parseDocument(readFileSync(file, 'utf8'));
     const parts = packParts(extractSections(body));
+    const messages = packMessages(parts, category, date, pageUrl(date, category));
 
     if (dry) {
-      console.log(`[discord] DRY ${category.label}: ${parts.length} part post(s) → ${pageUrl(date, category)}`);
-      for (const part of parts) console.log(part.split('\n').slice(0, 3).join(' | ').slice(0, 150));
+      console.log(`[discord] DRY ${category.label}: ${parts.length} part(s) → ${messages.length} message(s) → ${pageUrl(date, category)}`);
       continue;
     }
 
     try {
-      for (const [index, part] of parts.entries()) {
-        await postToDiscord(webhookUrl, { username: 'DailyInfo', content: part });
-        if (index < parts.length - 1) {
-          await new Promise((resolveDelay) => setTimeout(resolveDelay, 800));
+      for (const [index, payload] of messages.entries()) {
+        await postToDiscord(webhookUrl, payload);
+        if (index < messages.length - 1) {
+          await new Promise((resolveDelay) => setTimeout(resolveDelay, 900));
         }
       }
-      console.log(`[discord] ${category.label}: ${parts.length} part post(s) → ${pageUrl(date, category)}`);
+      console.log(`[discord] ${category.label}: ${parts.length} parts in ${messages.length} message(s) → ${pageUrl(date, category)}`);
       already.add(category.id);
       posted[date] = [...already].sort();
       postedSomething = true;
