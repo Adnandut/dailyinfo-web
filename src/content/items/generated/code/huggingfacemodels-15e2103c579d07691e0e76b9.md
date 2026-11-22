@@ -15,5 +15,5 @@ summary: "Mirage轻量图文理解模型，面向端侧与边缘计算的多模�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-17"]
 ---

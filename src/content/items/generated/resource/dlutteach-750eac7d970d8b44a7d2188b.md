@@ -14,5 +14,5 @@ summary: "相关教师或课程团队需按通知提交优质课程资源以推�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-16", "resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22"]
+briefing_ids: ["resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22"]
 ---

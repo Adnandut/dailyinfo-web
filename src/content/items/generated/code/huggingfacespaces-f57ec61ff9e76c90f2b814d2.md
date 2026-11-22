@@ -15,5 +15,5 @@ summary: "面向虚拟偶像与人物形象生成的 Gradio 工具，支持个�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-17"]
 ---

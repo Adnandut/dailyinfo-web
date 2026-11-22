@@ -15,5 +15,5 @@ summary: "轻量级静态站点形式的 AVA 展示项目，集中呈现其核�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-17"]
 ---

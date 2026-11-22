@@ -15,5 +15,5 @@ summary: "汇集ARC风格艺术图像资源，适用于风格化视觉生成、�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-17"]
 ---

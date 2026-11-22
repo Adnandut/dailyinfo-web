@@ -15,5 +15,5 @@ summary: "Speridlabs 的图像到 3D 模型 idol，支持从单张图像高效�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-17", "code-2026-11-18"]
 ---

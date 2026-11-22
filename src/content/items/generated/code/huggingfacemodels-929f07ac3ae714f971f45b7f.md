@@ -15,5 +15,5 @@ summary: "Facebook 的 SAM3 通用掩码生成模型，延续分割一切范式�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-17", "code-2026-11-18"]
 ---

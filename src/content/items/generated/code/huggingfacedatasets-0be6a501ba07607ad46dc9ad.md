@@ -15,5 +15,5 @@ summary: "中国A股Level-2逐笔委托与限价订单簿高频行情数据，�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-17", "code-2026-11-18"]
 ---

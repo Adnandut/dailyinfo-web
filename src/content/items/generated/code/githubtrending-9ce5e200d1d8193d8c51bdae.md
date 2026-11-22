@@ -15,5 +15,5 @@ summary: "plannotator 是让开发者持续掌控 Agent 的工作空间，可塑
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-17", "code-2026-11-18"]
 ---

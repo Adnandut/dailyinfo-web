@@ -15,5 +15,5 @@ summary: "提供以像素图集打包的GLB 3D模型资源，便于游戏与Web�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-17"]
+briefing_ids: ["code-2026-11-17"]
 ---

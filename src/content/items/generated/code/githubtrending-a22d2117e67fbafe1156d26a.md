@@ -15,5 +15,5 @@ summary: "LoopForge 是腾讯开源自托管的编码 Agent 交付工作流引�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-16", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-18"]
 ---
