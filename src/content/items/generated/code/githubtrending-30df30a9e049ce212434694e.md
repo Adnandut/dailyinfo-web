@@ -15,5 +15,5 @@ summary: "多智能体框架，用于自动化 AI 研究论文写作，协同完
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
 ---

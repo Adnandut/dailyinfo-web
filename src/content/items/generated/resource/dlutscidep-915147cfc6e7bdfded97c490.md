@@ -14,5 +14,5 @@ summary: "相关科研人员需关注并申请国家自然科学基金委员会�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-17", "resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23"]
+briefing_ids: ["resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23"]
 ---

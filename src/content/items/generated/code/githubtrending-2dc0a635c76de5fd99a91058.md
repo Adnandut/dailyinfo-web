@@ -15,5 +15,5 @@ summary: "last30days-skill 让 AI 智能体跨 Reddit、X、YouTube、HN、Polym
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23"]
 ---

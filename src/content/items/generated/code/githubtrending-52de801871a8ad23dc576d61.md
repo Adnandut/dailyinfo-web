@@ -15,5 +15,5 @@ summary: "多层级 AI Agent 技能与插件评估框架，提供质量门禁、
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-19"]
 ---

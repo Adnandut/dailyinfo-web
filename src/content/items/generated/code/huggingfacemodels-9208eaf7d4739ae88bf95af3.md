@@ -15,5 +15,5 @@ summary: "Qwen3.8-27B 多模态图文理解大模型，以 27B 规模提供强�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---

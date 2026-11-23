@@ -15,5 +15,5 @@ summary: "将评测框架结果聚合为可部署的排行榜，便于横向比�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---

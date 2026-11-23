@@ -15,5 +15,5 @@ summary: "百万级像素艺术图集数据集，为像素风生成与风格化�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---

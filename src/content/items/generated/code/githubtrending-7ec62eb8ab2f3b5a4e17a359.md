@@ -15,5 +15,5 @@ summary: "中国历史交互地图时间轴，覆盖公元前 403 年至今、18
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-19"]
 ---

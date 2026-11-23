@@ -15,5 +15,5 @@ summary: "基于 Qwen-Image 2.1 的无审查全能量化文生图模型，主打
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
 ---

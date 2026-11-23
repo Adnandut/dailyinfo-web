@@ -15,5 +15,5 @@ summary: "AG-UI 是 Agent-User Interaction Protocol，旨在把 AI Agent 无缝�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18"]
+briefing_ids: ["code-2026-11-18"]
 ---

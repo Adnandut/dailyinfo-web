@@ -15,5 +15,5 @@ summary: "多模态知识智能体项目，融合视觉与文本信息以进行�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-17", "code-2026-11-18", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-20"]
 ---
