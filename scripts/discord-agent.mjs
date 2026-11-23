@@ -124,6 +124,27 @@ class DiscordIO {
     const target = this.thread ?? this.message.channel;
     await target.send({ files: [{ attachment: Buffer.from(text, 'utf8'), name }] });
   }
+
+  /** Recent conversation context: the thread's starter message (often the
+   * digest notice the user is asking about) plus recent messages. */
+  async fetchHistory(limit = 8) {
+    const parts = [];
+    try {
+      const channel = this.thread ?? this.message.channel;
+      if (typeof channel.fetchStarterMessage === 'function') {
+        const starter = await channel.fetchStarterMessage();
+        if (starter?.content?.trim()) parts.push(`[thread starter — the notice/topic this thread is about]\n${clip(starter.content.replace(/<@!?\d+>/g, ''), 700)}`);
+      }
+      const msgs = await channel.messages.fetch({ limit: limit + 1, before: this.message.id });
+      const lines = [...msgs.values()].reverse()
+        .filter((m) => m.id !== this.message.id && m.author.id !== this.message.client.user.id && m.content?.trim())
+        .map((m) => `${m.author.username}: ${clip(m.content.replace(/<@!?\d+>/g, ''), 240)}`);
+      if (lines.length) parts.push(`[recent messages]\n${lines.join('\n')}`);
+    } catch {
+      /* history is best-effort */
+    }
+    return parts.join('\n\n');
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -344,7 +365,7 @@ async function fetchPageText(url, limit = 4000) {
   return { url: res.url || url, text: clip(htmlToText(await res.text()), limit) };
 }
 
-async function webResearch(query, chat, io) {
+async function webResearch(query, chat, io, contextNote = '') {
   await io.progress('🔎 searching the web…');
   const results = await webSearch(query);
   if (!results.length) return `I could not find anything for "${query}". Try rephrasing?`;
@@ -367,6 +388,7 @@ async function webResearch(query, chat, io) {
   const extracts = pages
     .map((p) => `=== ${p.url} ===\n${p.text}`)
     .join('\n\n');
+  const context = contextNote ? `\n\nContext from the user's thread (they are asking about this specific item):\n${clip(contextNote, 900)}` : '';
 
   const answer = await chat(
     [
@@ -376,13 +398,14 @@ async function webResearch(query, chat, io) {
           'You are a research assistant answering from web search results. '
           + 'Answer the user\'s question in short, information-dense English. '
           + 'Lead with the direct answer (what it is + the key details: who can apply, deadline, link, requirements — whichever are relevant). '
+          + 'If the thread context identifies a specific institution (e.g. Dalian University of Technology), connect the web findings to it — the user wants to know if THEY can still apply and what the deadline is. '
           + 'Cite sources inline as [1], [2] matching the numbered list. '
           + 'If the results do not contain the answer, say so plainly and give the closest official link you have. '
           + 'Never invent URLs or deadlines.',
       },
       {
         role: 'user',
-        content: `Question: ${query}\n\nSearch results:\n${sources}\n\nPage extracts:\n${clip(extracts, 9000)}`,
+        content: `Question: ${query}\n\nSearch results:\n${sources}\n\nPage extracts:\n${clip(extracts, 9000)}${context}`,
       },
     ],
     { maxTokens: 1100, temperature: 0.2 },
@@ -392,7 +415,7 @@ async function webResearch(query, chat, io) {
   return `${answer}\n\n**Sources:**\n${links}`;
 }
 
-async function classify(text, contextTitle, chat) {
+async function classify(text, contextTitle, chat, history = '') {
   const searchMatch = text.match(/^search\s+(.+)/i);
   if (searchMatch) return { action: 'search', argument: searchMatch[1] };
   if (/^(summarize|summarise|总结)\s*(this|it)?\s*[.!]?$/i.test(text)) return { action: 'summarize', argument: '' };
@@ -407,14 +430,14 @@ async function classify(text, contextTitle, chat) {
           + 'Rules: "fetch" = the user wants a specific paper fetched/summarized (title, arXiv link or ID, DOI) — argument is the title/link. '
           + '"summarize" = user says summarize this/it referring to the last fetched paper — argument empty. '
           + '"github" = asks what a GitHub repo does or names a repo — argument is the repo slug or URL. '
-          + '"web" = the user asks to find something ONLINE, needs a link/URL, pastes a notice/announcement and asks about it, or asks about programs, deadlines, news, tools, websites — anything needing current web info. argument is a SHORT web search query (3-8 words) derived from the message. '
+          + '"web" = the user asks to find something ONLINE, needs a link/URL, asks about a notice/program/deadline (including items mentioned in the thread context), or wants current web info. argument is a SHORT web search query (3-10 words) that includes the institution/program/year specifics from the thread context where available. '
           + '"ask" = a question answerable from the user\'s own daily digest corpus — argument is the question. '
           + '"search" = explicit corpus search ("search ..." phrasing) — argument the keywords. '
           + '"chat" = greetings, small talk, or anything that is none of the above — argument the message.',
       },
       {
         role: 'user',
-        content: `Context (last fetched paper title): ${contextTitle || '(none)'}\nMessage: ${clip(text, 600)}`,
+        content: `Context (last fetched paper title): ${contextTitle || '(none)'}\n${history ? `Thread context:\n${clip(history, 1400)}\n\n` : ''}Message: ${clip(text, 600)}`,
       },
     ],
     { maxTokens: 200, temperature: 0 },
@@ -443,7 +466,8 @@ export async function agentHandle(text, io) {
   const corpus = { items: bot.loadItems(), briefings: bot.loadBriefings() };
   const chat = (messages, options) => bot.chat(messages, options);
   io.contextTitle = threadPaper.get(io.contextKey) ?? '';
-  const route = await classify(text, io.contextTitle, chat);
+  const history = typeof io.fetchHistory === 'function' ? await io.fetchHistory() : '';
+  const route = await classify(text, io.contextTitle, chat, history);
 
   await io.ack(`⏳ ${route.action}${route.argument ? `: ${clip(route.argument, 120)}` : ''}…`);
 
@@ -453,15 +477,15 @@ export async function agentHandle(text, io) {
     return;
   }
   if (route.action === 'web') {
-    const reply = await webResearch(route.argument || text, chat, io);
+    const reply = await webResearch(route.argument || text, chat, io, history);
     await io.send(reply);
     return;
   }
   if (route.action === 'chat') {
     const reply = await chat(
       [
-        { role: 'system', content: 'You are the DailyInfo assistant. The user has a daily research digest (papers, AI news, code, resources). Answer helpfully in English; if their message looks like a paper title, offer to fetch it. If they ask you to find something online, say the word "find" and what to search for.' },
-        { role: 'user', content: text },
+        { role: 'system', content: 'You are the DailyInfo assistant. The user has a daily research digest (papers, AI news, code, resources). Answer helpfully in English; if their message looks like a paper title, offer to fetch it. If they ask you to find something online, say the word "find" and what to search for. If their message refers to earlier thread messages, use them as context.' },
+        { role: 'user', content: `${history ? `Thread context:\n${clip(history, 1200)}\n\n` : ''}Message: ${text}` },
       ],
       { maxTokens: 900, temperature: 0.4 },
     );
