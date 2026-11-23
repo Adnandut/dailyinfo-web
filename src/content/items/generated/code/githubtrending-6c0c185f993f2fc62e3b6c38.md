@@ -9,11 +9,11 @@ source:
   external_id: "obra/superpowers"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-23T03:45:01.226076+08:00"
+retrieved_at: "2026-11-24T03:45:01.178508+08:00"
 published_at: "2026-10-02T05:31:00.047781+08:00"
-summary: "superpowers 提供可落地的智能体技能框架与软件开发方法论，帮助团队把 agentic 工作流系统化融入研发流程。"
+summary: "superpowers 是面向 AI Agent 的技能框架与软件开发方法论，强调可落地的代理式技能组织与工程协作流程。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24"]
 ---

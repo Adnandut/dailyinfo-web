@@ -9,11 +9,11 @@ source:
   external_id: "nvidia/USDCraft-10K"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-20T03:45:20.760953+08:00"
+retrieved_at: "2026-11-24T03:45:21.939728+08:00"
 published_at: "2026-11-18T03:45:52.649993+08:00"
-summary: "万级USD格式3D资产数据集，面向可组合场景构建与生成式3D建模。"
+summary: "NVIDIA 发布的万级 USD 格式三维资产数据集，面向可仿真场景构建、3D 生成与机器人学习。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
 ---

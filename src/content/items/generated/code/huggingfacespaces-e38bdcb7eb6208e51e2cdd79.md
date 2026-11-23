@@ -9,11 +9,11 @@ source:
   external_id: "joelniklaus/harness-leaderboard"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-20T03:45:26.107935+08:00"
+retrieved_at: "2026-11-24T03:45:31.672162+08:00"
 published_at: "2026-11-07T03:45:56.495059+08:00"
-summary: "将评测框架结果聚合为可部署的排行榜，便于横向比较模型能力并持续追踪基准表现。"
+summary: "joelniklaus/harness-leaderboard — 基于Docker的Harness评测排行榜，用于统一比较大模型基准表现并提升评测可复现性。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
 ---

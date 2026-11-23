@@ -9,11 +9,11 @@ source:
   external_id: "nvidia/PhysicalAI-Human-1M-100K"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-18T03:45:21.699277+08:00"
+retrieved_at: "2026-11-24T03:45:21.939728+08:00"
 published_at: "2026-11-13T08:38:21.049658+08:00"
-summary: "面向物理AI的百万帧/十万序列级人体数据资源，支撑人体运动理解、建模与人形机器人仿真。"
+summary: "NVIDIA 面向物理 AI 的大规模人体动作与交互数据集，支撑人形机器人训练和物理仿真研究。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-24"]
 ---

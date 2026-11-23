@@ -9,11 +9,11 @@ source:
   external_id: "mjmirza/app-store-compliance"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-23T03:45:01.226076+08:00"
+retrieved_at: "2026-11-24T03:45:01.178508+08:00"
 published_at: "2026-11-20T03:45:36.560503+08:00"
-summary: "app-store-compliance 提供应用商店合规开放手册与提交前守卫，覆盖 124 种拒审模式、隐私清单、数据安全检查和 112 个法规截止日期。"
+summary: "app-store-compliance 提供应用商店合规开放手册与提交前守卫，内置 124 个拒审模式修复、隐私清单/数据安全检查和 112 项法规截止日期跟踪，并可作为 AI 编码代理技能使用。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24"]
 ---

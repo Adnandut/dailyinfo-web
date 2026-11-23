@@ -9,11 +9,11 @@ source:
   external_id: "inworld/voice-isolator"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-20T03:45:10.738112+08:00"
+retrieved_at: "2026-11-24T03:45:12.556085+08:00"
 published_at: "2026-11-20T03:45:36.560503+08:00"
-summary: "Inworld 语音隔离模型，专注从混合音频中分离、净化人声，提升语音清晰度。"
+summary: "音频到音频的语音隔离模型，核心是从混合音轨中提取清晰人声。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-24"]
 ---

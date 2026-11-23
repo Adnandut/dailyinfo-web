@@ -9,11 +9,11 @@ source:
   external_id: "amisima/Qwen-2.1-Turbo-Qwen-Face-Swap-MOSS-Image-Edit-Outpaint-Qwen-Detail-Enhancer"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-20T03:45:26.107935+08:00"
+retrieved_at: "2026-11-24T03:45:31.672162+08:00"
 published_at: "2026-11-18T03:45:52.649993+08:00"
-summary: "将 Qwen 2.1 Turbo、人脸替换、MOSS 图像编辑、外扩与细节增强串联为一体化 Gradio 工作流，实现多阶段图像编辑与增强。"
+summary: "amisima/Qwen-2.1-Turbo-Qwen-Face-Swap-MOSS-Image-Edit-Outpaint-Qwen-Detail-Enhancer — 集成Qwen-2.1-Turbo、换脸、MOSS图像编辑、扩图与细节增强的Gradio多合一图像处理工作流。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
 ---
