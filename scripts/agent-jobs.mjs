@@ -13,6 +13,10 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..');
 
 export function createJobRunner() {
+  // Front-ends (web UI / Discord) are not the interactive REPL — the bot
+  // hides CLI-only guidance ("And run: summarize …", "type zotero or ris",
+  // candidate-pick hints) when this is set.
+  process.env.DAILYINFO_AGENT = '1';
   const jobs = new Map();
   let counter = 0;
   let active = null;

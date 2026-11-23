@@ -24,7 +24,7 @@
 import { Client, GatewayIntentBits, Events } from 'discord.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import https from 'node:https';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createJobRunner } from './agent-jobs.mjs';
@@ -578,6 +578,23 @@ export async function agentHandle(text, io) {
       threadPaper.set(io.contextKey, fetchedTitle);
       io.contextTitle = fetchedTitle;
       writeAgentState({ lastPaperTitle: fetchedTitle });
+    }
+    // "summarize this article" in the same breath — fetch, then summarize
+    // in one go (only possible when a PDF was actually saved; a paywalled
+    // paper already got its abstract summary from the fetch).
+    if (fetchedTitle && /\bsummar(y|ise|ize)\b/i.test(text)) {
+      const slug = bot.slugifyFile(fetchedTitle);
+      if (existsSync(join(repo, 'runtime/papers', `${slug}.pdf`))) {
+        await io.send('⏳ summarizing the fetched paper…');
+        const sumJob = runner.submit(`summarize ${slug}`);
+        await sumJob.done;
+        if (sumJob.status === 'done') {
+          const sumReply = cleanLogForReply(sumJob.log) || sumJob.result || '';
+          if (sumReply) await io.send(sumReply);
+        } else {
+          await io.send(`⚠️ summary failed: ${sumJob.result}`);
+        }
+      }
     }
   }
 }

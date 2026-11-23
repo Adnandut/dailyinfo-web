@@ -923,6 +923,8 @@ function getLastFetchedPaper() {
   return lastFetchedPaper;
 }
 
+const AGENT_MODE = process.env.DAILYINFO_AGENT === '1';
+
 async function presentAndSummarize(paper, { allowUniLink = false } = {}) {
     lastFetchedPaper = paper;
     console.log(`\nPaper: ${paper.title}`);
@@ -943,7 +945,7 @@ async function presentAndSummarize(paper, { allowUniLink = false } = {}) {
     console.log(`[agent] ${text.length.toLocaleString()} chars extracted Ã¢â‚¬â€ summarizingÃ¢â‚¬Â¦\n`);
     const summary = await summarizeText(text);
     console.log(`\n${summary}\n`);
-    console.log('Keep it: type "zotero" (save to Zotero library) or "ris" (citation file for Mendeley).');
+    if (!AGENT_MODE) console.log('Keep it: type "zotero" (save to Zotero library) or "ris" (citation file for Mendeley).');
     return;
   }
   // Paywalled Ã¢â‚¬â€ hybrid fallback: institutional link (only if you confirm) + drop folder.
@@ -972,14 +974,16 @@ University access (WebVPN) Ã¢â‚¬â€ 3 steps:
         }
       } else {
       console.log(`\nPaper page: ${landing}`);
-      console.log('(university access link withheld Ã¢â‚¬â€ in the REPL answer y, or rerun with --uni)');
+      if (!AGENT_MODE) console.log('(university access link withheld - answer y in the REPL, or rerun with --uni)');
     }
   } else if (landing) {
     console.log(`\nPaper page: ${landing}`);
     console.log('(Tip: set UNI_EZPROXY_URL in .env to get one-click university links.)');
   }
-  console.log(`\nThen save the PDF as: runtime/papers/${slugifyFile(paper.title)}.pdf`);
-  console.log(`And run: summarize ${slugifyFile(paper.title)}`);
+  if (!AGENT_MODE) {
+    console.log(`\nThen save the PDF as: runtime/papers/${slugifyFile(paper.title)}.pdf`);
+    console.log(`And run: summarize ${slugifyFile(paper.title)}`);
+  }
   if (paper.abstract) {
     console.log('\nMeanwhile, here is the abstract:\n');
     const summary = await chat(
@@ -991,7 +995,7 @@ University access (WebVPN) Ã¢â‚¬â€ 3 steps:
     );
     console.log(summary);
   }
-  console.log('\nKeep it: type "zotero" (save to Zotero library) or "ris" (citation file for Mendeley).');
+  if (!AGENT_MODE) console.log('\nKeep it: type "zotero" (save to Zotero library) or "ris" (citation file for Mendeley).');
 }
 
 async function fetchCommand(corpus, rawArgument) {
@@ -1052,7 +1056,8 @@ async function fetchCommand(corpus, rawArgument) {
       index = await candidatePicker(candidates.length);
       if (index < 0) return;
     } else if (scores[0] >= AUTO_PICK_THRESHOLD) {
-      if (candidates.length > 1) {
+      // 100% title match (the user pasted the exact title) - no ranking dance.
+      if (candidates.length > 1 && scores[0] < 1) {
         printCandidates(candidates, scores);
         console.log(`(auto-picking 1 Ã¢â‚¬â€ ${Math.round(scores[0] * 100)}% title match; rerun with --pick N to choose another)\n`);
       }
