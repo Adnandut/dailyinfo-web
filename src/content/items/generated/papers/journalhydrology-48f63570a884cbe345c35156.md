@@ -1,0 +1,19 @@
+---
+schema_version: 1
+id: "journalhydrology-48f63570a884cbe345c35156"
+category: "papers"
+title: "Hydrodynamic controls on mineral precipitation in porous media: From pore-scale clogging to continuum permeability upscaling"
+source:
+  name: "journal_hydrology"
+  url: "https://www.sciencedirect.com/science/article/pii/S002216942601944X?dgcid=rss_sd_all"
+  external_id: "https://www.sciencedirect.com/science/article/pii/S002216942601944X"
+authors: []
+source_published_at: "2026-11-23T20:15:17+08:00"
+retrieved_at: "2026-11-24T04:01:01.943903+08:00"
+published_at: "2026-11-24T04:01:14.729349+08:00"
+summary: "阐明多孔介质中水动力条件对矿物沉淀的控制机制，并建立从孔隙尺度堵塞到连续尺度渗透率升尺度的分析框架。"
+why_it_matters: null
+tags: []
+language: "zh-CN"
+briefing_ids: ["papers-2026-11-24"]
+---
