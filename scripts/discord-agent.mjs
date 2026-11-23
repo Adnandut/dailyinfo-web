@@ -89,12 +89,53 @@ class DiscordIO {
     this.ackMessage = null; // NB: never name this `ack` — it shadows the ack() method
     this.thread = null;
     this.lastEdit = 0;
+    this.typingTimer = null;
+    this.finished = false;
+    // "DailyInfo is typing…" like WhatsApp — sendTyping lasts ~10s, renew early.
+    this.startTyping();
   }
+
+  /** best-effort: never let cosmetics break the agent */
+  async tryReact(emoji) {
+    try { await this.message.react(emoji); } catch { /* Add Reactions may be missing */ }
+  }
+
+  async tryRemoveReactions() {
+    try {
+      for (const reaction of this.message.reactions.cache.values()) {
+        await reaction.users.remove(this.message.client.user.id);
+      }
+    } catch { /* cosmetic */ }
+  }
+
+  startTyping() {
+    if (this.typingTimer) return;
+    const send = () => { try { void (this.thread ?? this.message.channel).sendTyping(); } catch { /* cosmetic */ } };
+    send();
+    this.typingTimer = setInterval(send, 8500);
+  }
+
+  stopTyping() {
+    if (this.typingTimer) { clearInterval(this.typingTimer); this.typingTimer = null; }
+  }
+
+  /** Final lifecycle state on the owner's message: ✅ done / ⚠️ failed. */
+  finish(ok = true) {
+    if (this.finished) return;
+    this.finished = true;
+    this.stopTyping();
+    void (async () => {
+      await this.tryRemoveReactions();
+      await this.tryReact(ok ? '✅' : '⚠️');
+    })();
+  }
+
   get contextKey() {
     return this.thread?.id ?? this.message.channel.id;
   }
   async ack(text) {
     this.ackMessage = await this.message.reply({ content: clip(text, MAX_MESSAGE_CHARS) });
+    await this.tryReact('⏳');
     if (!this.message.channel.isThread()) {
       try {
         this.thread = await this.ackMessage.startThread({ name: clip(text, 60) || 'agent', autoArchiveDuration: 1440 });
@@ -618,7 +659,15 @@ function main() {
       if (text.length < 2) return;
       console.log(`[discord-agent] ${message.author.username} in #${message.channel.name ?? 'dm'}: ${clip(text, 100)}`);
       const io = new DiscordIO(message);
-      await agentHandle(text, io);
+      await io.tryReact('👀'); // instant "agent is alive" signal
+      try {
+        await agentHandle(text, io);
+        io.finish(true);
+      } catch (error) {
+        io.finish(false);
+        console.error(`[discord-agent] error: ${error.message}`);
+        try { await message.reply({ content: clip(`⚠️ ${error.message}`, MAX_MESSAGE_CHARS) }); } catch { /* channel may be unusable */ }
+      }
     } catch (error) {
       console.error(`[discord-agent] error: ${error.message}`);
       try { await message.reply({ content: clip(`⚠️ ${error.message}`, MAX_MESSAGE_CHARS) }); } catch { /* channel may be unusable */ }
