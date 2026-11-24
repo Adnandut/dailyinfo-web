@@ -134,7 +134,14 @@ class DiscordIO {
     return this.thread?.id ?? this.message.channel.id;
   }
   async ack(text) {
-    this.ackMessage = await this.message.reply({ content: clip(text, MAX_MESSAGE_CHARS) });
+    const payload = { content: clip(text, MAX_MESSAGE_CHARS) };
+    try {
+      this.ackMessage = await this.message.reply(payload);
+    } catch {
+      // Some messages cannot be replied to (threads under webhook digest
+      // posts, system messages) — fall back to a plain channel message.
+      this.ackMessage = await this.message.channel.send(payload);
+    }
     await this.tryReact('⏳');
     if (!this.message.channel.isThread()) {
       try {
@@ -566,24 +573,12 @@ async function runTool(tool, argument, ctx) {
       threadPaper.set(io.contextKey, fetchedTitle);
       writeAgentState({ lastPaperTitle: fetchedTitle, lastPaperUrl: paperUrl });
       // The fetch output IS the user-facing content — deliver it directly.
+      // NB: no chained summarize here. When an OA PDF exists, the fetch has
+      // ALREADY produced the full-text summary; when paywalled, there is no
+      // PDF to summarize. Chaining only burned tokens twice (user-reported).
       await io.send(cleanLogForReply(job.log) || job.result || '(no output)');
       await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).');
-      // "summarize this article" / "explain the method" in the same breath —
-      // chain the full-text summary when a PDF was actually saved (a
-      // paywalled paper already got its abstract summary from the fetch).
-      if (fetchedTitle && /\b(summar(y|ise|ize)|explain|method|approach|how does|why)\b/i.test(text)) {
-        const slug = bot.slugifyFile(fetchedTitle);
-        if (existsSync(join(repo, 'runtime/papers', `${slug}.pdf`))) {
-          await io.send('⏳ summarizing the fetched paper…');
-          const sumJob = runner.submit(`summarize ${slug}`);
-          await sumJob.done;
-          const sumOut = cleanLogForReply(sumJob.log) || sumJob.result || '';
-          if (sumJob.status === 'done' && sumOut) await io.send(sumOut);
-          return `Fetched "${fetchedTitle}" and appended the full-text summary above.`;
-        }
-        return `Fetched "${fetchedTitle}" (no open-access PDF — the abstract summary above is all that is available).`;
-      }
-      return `Fetched "${fetchedTitle ?? '?'}". Output already delivered to the user.`;
+      return `Fetched "${fetchedTitle}". The full summary is ALREADY delivered above — do NOT call summarize_pdf for it again.`;
     }
     case 'summarize_pdf': {
       const job = runner.submit(`summarize ${argument}`.trim());
@@ -852,7 +847,11 @@ function main() {
       }
     } catch (error) {
       console.error(`[discord-agent] error: ${error.message}`);
-      try { await message.reply({ content: clip(`⚠️ ${error.message}`, MAX_MESSAGE_CHARS) }); } catch { /* channel may be unusable */ }
+      try {
+        await message.reply({ content: clip(`⚠️ ${error.message}`, MAX_MESSAGE_CHARS) });
+      } catch {
+        try { await message.channel.send({ content: clip(`⚠️ ${error.message}`, MAX_MESSAGE_CHARS) }); } catch { /* channel may be unusable */ }
+      }
     }
   });
   client.login(process.env.DISCORD_BOT_TOKEN).catch((error) => {
