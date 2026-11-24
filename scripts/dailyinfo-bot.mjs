@@ -1284,10 +1284,10 @@ async function runCommand(corpus, input) {
         papersCommand();
         return true;
       case 'zotero':
-        await zoteroCommand();
+        await zoteroCommand(argument);
         return true;
       case 'ris':
-        await risCommand();
+        await risCommand(argument);
         return true;
     case 'exit':
     case 'quit':

@@ -461,15 +461,20 @@ async function classify(text, contextTitle, chat, history = '') {
   if (searchMatch) return { action: 'search', argument: searchMatch[1] };
   if (/^(summarize|summarise|总结)\s*(this|it)?\s*[.!]?$/i.test(text)) return { action: 'summarize', argument: '' };
   if (looksLikeGithubRepo(text)) return { action: 'github', argument: text };
+  if (/^(zotero|ris)\b/i.test(text) || /\b(save|add|export)\b.{0,30}\b(zotero|citation|reference|mendeley|ris file)/i.test(text)) {
+    return { action: /^(ris)\b/i.test(text) || /mendeley|\bris file\b/i.test(text) ? 'ris' : 'zotero', argument: '' };
+  }
 
   const json = await chat(
     [
       {
         role: 'system',
         content:
-          'You route messages for a research assistant. Reply ONLY with minified JSON: {"action":"fetch|summarize|ask|github|web|search|chat","argument":"..."}. '
+          'You route messages for a research assistant. Reply ONLY with minified JSON: {"action":"fetch|summarize|ask|github|web|search|zotero|chat","argument":"..."}. '
           + 'Rules: "fetch" = the user wants a specific paper fetched/summarized (title, arXiv link or ID, DOI) — argument is the title/link. '
+          + 'IMPORTANT: a message that contains a specific research-paper title (a technical work title, often with a colon) followed by "explain"/"summarize"/"how"/"what is the method" is a FETCH — the paper pipeline explains the method from the paper itself. '
           + '"summarize" = user says summarize this/it referring to the last fetched paper — argument empty. '
+          + '"zotero" = save the last fetched paper to the Zotero library — argument empty. '
           + '"github" = asks what a GitHub repo does or names a repo — argument is the repo slug or URL. '
           + '"web" = the user asks to find something ONLINE, needs a link/URL, asks about a notice/program/deadline (including items mentioned in the thread context), or wants current web info. argument is a SHORT web search query (3-10 words) that includes the institution/program/year specifics from the thread context where available. '
           + '"ask" = a question answerable from the user\'s own daily digest corpus — argument is the question. '
@@ -508,7 +513,22 @@ export async function agentHandle(text, io) {
   const chat = (messages, options) => bot.chat(messages, options);
   io.contextTitle = threadPaper.get(io.contextKey) ?? '';
   const history = typeof io.fetchHistory === 'function' ? await io.fetchHistory() : '';
-  const route = await classify(text, io.contextTitle, chat, history);
+  let route = await classify(text, io.contextTitle, chat, history);
+
+  // A digest paper by title must go to the paper pipeline even when the
+  // message is phrased as a question ("explain the method…") — the LLM
+  // router alone misroutes those to web search. A strong corpus title
+  // match decides deterministically.
+  if (!['fetch', 'summarize', 'zotero', 'ris'].includes(route.action)) {
+    try {
+      const top = bot.search(corpus, text)[0];
+      if (top && bot.relevanceScore({ title: top.title }, text) >= 0.6) {
+        route = { action: 'fetch', argument: text };
+      }
+    } catch {
+      /* routing fallback — keep the LLM's choice */
+    }
+  }
 
   await io.ack(`⏳ ${route.action}${route.argument ? `: ${clip(route.argument, 120)}` : ''}…`);
 
@@ -572,17 +592,20 @@ export async function agentHandle(text, io) {
   if (route.action === 'fetch') {
     // The hot-reloaded job module loses its internal state between jobs —
     // recover the fetched paper title from the log for per-thread context.
-    const fetchedTitle = job.log.join('').match(/^Paper: (.+)$/m)?.[1]
+    const logText = job.log.join('');
+    const fetchedTitle = logText.match(/^Paper: (.+)$/m)?.[1]
       ?? bot.getLastFetchedPaper()?.title;
+    const paperUrl = logText.match(/^Paper page: (\S+)$/m)?.[1] ?? '';
     if (fetchedTitle) {
       threadPaper.set(io.contextKey, fetchedTitle);
       io.contextTitle = fetchedTitle;
-      writeAgentState({ lastPaperTitle: fetchedTitle });
+      writeAgentState({ lastPaperTitle: fetchedTitle, lastPaperUrl: paperUrl });
     }
-    // "summarize this article" in the same breath — fetch, then summarize
-    // in one go (only possible when a PDF was actually saved; a paywalled
-    // paper already got its abstract summary from the fetch).
-    if (fetchedTitle && /\bsummar(y|ise|ize)\b/i.test(text)) {
+    await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).');
+    // "summarize this article" / "explain the method" in the same breath —
+    // fetch, then summarize in one go (only possible when a PDF was actually
+    // saved; a paywalled paper already got its abstract summary).
+    if (fetchedTitle && /\b(summar(y|ise|ize)|explain|method|approach|how does|why)\b/i.test(text)) {
       const slug = bot.slugifyFile(fetchedTitle);
       if (existsSync(join(repo, 'runtime/papers', `${slug}.pdf`))) {
         await io.send('⏳ summarizing the fetched paper…');
