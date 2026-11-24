@@ -908,9 +908,9 @@ function relevanceScore(paper, query) {
 function printCandidates(candidates, scores = []) {
   console.log(`\nFound ${candidates.length} candidate(s):\n`);
   candidates.forEach((paper, index) => {
-    const score = scores[index] != null ? ` Ã‚Â· ${Math.round(scores[index] * 100)}% match` : '';
+    const score = scores[index] != null ? ` · ${Math.round(scores[index] * 100)}% match` : '';
     console.log(`  ${index + 1}. [${paper.year || '????'}] ${paper.title}`);
-    console.log(`     ${[paper.venue, paper.provider, paper.citations != null ? `${paper.citations} citations` : ''].filter(Boolean).join(' Ã‚Â· ')}${score}`);
+    console.log(`     ${[paper.venue, paper.provider, paper.citations != null ? `${paper.citations} citations` : ''].filter(Boolean).join(' · ')}${score}`);
   });
   console.log('');
 }

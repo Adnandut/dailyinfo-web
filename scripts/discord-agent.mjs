@@ -24,7 +24,7 @@
 import { Client, GatewayIntentBits, Events } from 'discord.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import https from 'node:https';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createJobRunner } from './agent-jobs.mjs';
@@ -468,6 +468,7 @@ const AGENT_SYSTEM =
   + '• Multi-step requests ("find X and save it to Zotero") → plan the minimal tool sequence yourself. '
   + '• zotero_save needs the Zotero desktop app open on this PC; if the result says it is not running, tell the user to open it and say "zotero" again. '
   + '• Small talk or anything needing no tool → reply with {"answer": "..."} immediately. '
+  + '• Recurring multi-step workflows have SKILLS — if one matches the request, call use_skill and then follow its instructions step by step with the other tools. '
   + '• Tool output already delivered to the user must NOT be repeated in the final answer — synthesize, add next steps, or keep the answer to one line.';
 
 const TOOL_SPEC = [
@@ -479,8 +480,34 @@ const TOOL_SPEC = [
   '{"tool":"github_repo","argument":"<owner/repo or URL>"}',
   '{"tool":"zotero_save","argument":""}',
   '{"tool":"ris_file","argument":""}',
+  '{"tool":"use_skill","argument":"<skill-name> [: extra details]"}',
   '{"answer":"<final reply to the user>"}',
 ].join('\n');
+
+/** Skills are plain markdown files in skills/ — "When:" line describes the
+ * trigger, everything after `---` is the procedure the agent follows. Users
+ * add or edit skills without touching code; they are re-read every message. */
+function loadSkills() {
+  const dir = join(repo, 'skills');
+  try {
+    return readdirSync(dir)
+      .filter((f) => f.endsWith('.md'))
+      .map((f) => {
+        try {
+          const raw = readFileSync(join(dir, f), 'utf8');
+          const when = raw.match(/^When:\s*(.+)$/m)?.[1]?.trim() ?? '';
+          const dash = raw.indexOf('\n---');
+          const instructions = (dash >= 0 ? raw.slice(dash + 4) : raw.replace(/^When:.*$/m, '')).trim();
+          return { name: f.replace(/\.md$/, ''), when, instructions };
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
 
 /** Parse {"tool":...}|{"answer":...} out of a possibly chatty LLM reply. */
 function parseDecision(raw) {
@@ -513,10 +540,14 @@ async function runTool(tool, argument, ctx) {
       const logText = job.log.join('');
       const fetchedTitle = logText.match(/^Paper: (.+)$/m)?.[1];
       const paperUrl = logText.match(/^Paper page: (\S+)$/m)?.[1] ?? '';
-      if (fetchedTitle) {
-        threadPaper.set(io.contextKey, fetchedTitle);
-        writeAgentState({ lastPaperTitle: fetchedTitle, lastPaperUrl: paperUrl });
+      if (!fetchedTitle) {
+        // No confident match — report back as an observation so the agent can
+        // refine the query or fall back to web_search, instead of dumping the
+        // CLI candidate list into the chat.
+        return `FETCH: no confident match for "${argument}". The candidates did not pass the relevance gate — refine the title or use web_search.`;
       }
+      threadPaper.set(io.contextKey, fetchedTitle);
+      writeAgentState({ lastPaperTitle: fetchedTitle, lastPaperUrl: paperUrl });
       // The fetch output IS the user-facing content — deliver it directly.
       await io.send(cleanLogForReply(job.log) || job.result || '(no output)');
       await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).');
@@ -570,6 +601,20 @@ async function runTool(tool, argument, ctx) {
       await io.send(out);
       return 'RIS result delivered to the user.';
     }
+    case 'use_skill': {
+      const skills = loadSkills();
+      const [name, ...rest] = String(argument ?? '').split(/[:\s]+/).filter(Boolean);
+      const skill = skills.find((s) => s.name.toLowerCase() === (name ?? '').toLowerCase());
+      if (!skill) {
+        return `UNKNOWN SKILL "${name}". Available: ${skills.map((s) => s.name).join(', ') || '(none)'}.`;
+      }
+      const details = rest.join(' ').trim();
+      return [
+        `SKILL "${skill.name}" LOADED. Follow these instructions now using the other tools as needed.`,
+        skill.instructions,
+        details ? `\nUser request details for this skill: ${details}` : '',
+      ].join('\n');
+    }
     default:
       return `UNKNOWN TOOL "${tool}" — pick one from the list.`;
   }
@@ -598,8 +643,12 @@ export async function agentHandle(text, io) {
     + (history ? `\n\nThread context:\n${clip(history, 1400)}` : '')
     + `\n\nUser message: ${text}`;
 
+  const skills = loadSkills();
+  const skillCatalog = skills.length
+    ? `\n\nSKILLS (recurring workflows — call use_skill when one matches, then follow its instructions):\n${skills.map((s) => `- ${s.name}: ${s.when}`).join('\n')}`
+    : '';
   const messages = [
-    { role: 'system', content: `${AGENT_SYSTEM}\n\n${TOOL_SPEC}` },
+    { role: 'system', content: `${AGENT_SYSTEM}\n\n${TOOL_SPEC}${skillCatalog}` },
     { role: 'user', content: contextBlock },
   ];
 
