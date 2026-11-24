@@ -192,12 +192,6 @@ class DiscordIO {
 // Agent core — testable without Discord (io is the I/O adapter).
 // ---------------------------------------------------------------------------
 
-function looksLikeGithubRepo(text) {
-  if (/github\.com\//i.test(text)) return true;
-  const bare = text.trim().match(/^[\w.-]+\/[\w.-]+$/);
-  return Boolean(bare && /\b(do|does|repo|github|what|about)\b/i.test(text));
-}
-
 async function githubRepoSummary(argument, chat) {
   const match = argument.match(/github\.com\/([\w.-]+)\/([\w.-]+)/i)
     ?? argument.trim().match(/^([\w.-]+)\/([\w.-]+)$/);
@@ -456,46 +450,129 @@ async function webResearch(query, chat, io, contextNote = '') {
   return `${answer}\n\n**Sources:**\n${links}`;
 }
 
-async function classify(text, contextTitle, chat, history = '') {
-  const searchMatch = text.match(/^search\s+(.+)/i);
-  if (searchMatch) return { action: 'search', argument: searchMatch[1] };
-  if (/^(summarize|summarise|总结)\s*(this|it)?\s*[.!]?$/i.test(text)) return { action: 'summarize', argument: '' };
-  if (looksLikeGithubRepo(text)) return { action: 'github', argument: text };
-  if (/^(zotero|ris)\b/i.test(text) || /\b(save|add|export)\b.{0,30}\b(zotero|citation|reference|mendeley|ris file)/i.test(text)) {
-    return { action: /^(ris)\b/i.test(text) || /mendeley|\bris file\b/i.test(text) ? 'ris' : 'zotero', argument: '' };
-  }
+// ---------------------------------------------------------------------------
+// Agent loop — the LLM plans tool calls step by step, observes each result,
+// and continues until the request is satisfied. This is what makes it an
+// agent instead of a command router: "find this paper and save it to
+// Zotero" becomes fetch → observe → save → report, in one conversation turn.
+// ---------------------------------------------------------------------------
 
-  const json = await chat(
-    [
-      {
-        role: 'system',
-        content:
-          'You route messages for a research assistant. Reply ONLY with minified JSON: {"action":"fetch|summarize|ask|github|web|search|zotero|chat","argument":"..."}. '
-          + 'Rules: "fetch" = the user wants a specific paper fetched/summarized (title, arXiv link or ID, DOI) — argument is the title/link. '
-          + 'IMPORTANT: a message that contains a specific research-paper title (a technical work title, often with a colon) followed by "explain"/"summarize"/"how"/"what is the method" is a FETCH — the paper pipeline explains the method from the paper itself. '
-          + '"summarize" = user says summarize this/it referring to the last fetched paper — argument empty. '
-          + '"zotero" = save the last fetched paper to the Zotero library — argument empty. '
-          + '"github" = asks what a GitHub repo does or names a repo — argument is the repo slug or URL. '
-          + '"web" = the user asks to find something ONLINE, needs a link/URL, asks about a notice/program/deadline (including items mentioned in the thread context), or wants current web info. argument is a SHORT web search query (3-10 words) that includes the institution/program/year specifics from the thread context where available. '
-          + '"ask" = a question answerable from the user\'s own daily digest corpus — argument is the question. '
-          + '"search" = explicit corpus search ("search ..." phrasing) — argument the keywords. '
-          + '"chat" = greetings, small talk, or anything that is none of the above — argument the message.',
-      },
-      {
-        role: 'user',
-        content: `Context (last fetched paper title): ${contextTitle || '(none)'}\n${history ? `Thread context:\n${clip(history, 1400)}\n\n` : ''}Message: ${clip(text, 600)}`,
-      },
-    ],
-    { maxTokens: 200, temperature: 0 },
-  );
+const AGENT_SYSTEM =
+  'You are DailyInfo, a research AGENT on Discord serving one owner (a DUT researcher with a daily digest of papers, AI news, code, resources). '
+  + 'You work toward the user\'s request by calling tools step by step, observing each result, and deciding what to do next. '
+  + 'Guidelines: '
+  + '• A research-paper title (often pasted verbatim, sometimes followed by "explain the method"/"summarize") → call fetch_paper. The fetch output answers abstract-level questions; if a PDF was saved and the user asked for depth, also call summarize_pdf. '
+  + '• Paywalled paper → say so plainly, give the DOI, and mention university (WebVPN) access as their manual option. Never pretend you read the full text. '
+  + '• Notices, programs, deadlines, official links, current info → web_search (include institution/program/year specifics from the thread context). '
+  + '• "what\'s in today\'s digest" style questions about their own feed → corpus_search. '
+  + '• Multi-step requests ("find X and save it to Zotero") → plan the minimal tool sequence yourself. '
+  + '• zotero_save needs the Zotero desktop app open on this PC; if the result says it is not running, tell the user to open it and say "zotero" again. '
+  + '• Small talk or anything needing no tool → reply with {"answer": "..."} immediately. '
+  + '• Tool output already delivered to the user must NOT be repeated in the final answer — synthesize, add next steps, or keep the answer to one line.';
 
-  try {
-    const parsed = JSON.parse(json.replaceAll(/```json|```/g, '').trim());
-    if (parsed && parsed.action) return parsed;
-  } catch {
-    /* fall through to chat */
+const TOOL_SPEC = [
+  'TOOLS — reply with EXACTLY ONE JSON object per turn:',
+  '{"tool":"fetch_paper","argument":"<paper title | arXiv link/ID | DOI>"}',
+  '{"tool":"summarize_pdf","argument":"<slug of a fetched paper>"}',
+  '{"tool":"corpus_search","argument":"<keywords>"}',
+  '{"tool":"web_search","argument":"<short query>"}',
+  '{"tool":"github_repo","argument":"<owner/repo or URL>"}',
+  '{"tool":"zotero_save","argument":""}',
+  '{"tool":"ris_file","argument":""}',
+  '{"answer":"<final reply to the user>"}',
+].join('\n');
+
+/** Parse {"tool":...}|{"answer":...} out of a possibly chatty LLM reply. */
+function parseDecision(raw) {
+  const cleaned = String(raw ?? '').replace(/```json|```/g, '').trim();
+  const start = cleaned.indexOf('{');
+  if (start >= 0) {
+    for (let end = cleaned.length; end > start; end--) {
+      try {
+        const parsed = JSON.parse(cleaned.slice(start, end));
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.answer !== undefined) return { answer: String(parsed.answer) };
+          if (parsed.tool) return { tool: String(parsed.tool), argument: parsed.argument == null ? '' : String(parsed.argument) };
+        }
+      } catch {
+        /* shrink the window and retry */
+      }
+    }
   }
-  return { action: 'chat', argument: text };
+  return { answer: cleaned || '(no output)' };
+}
+
+async function runTool(tool, argument, ctx) {
+  const { text, bot, corpus, chat, io } = ctx;
+  switch (tool) {
+    case 'fetch_paper': {
+      if (runner.busy()) return 'BUSY: another job is still running — wait a moment, then continue.';
+      const job = runner.submit(`fetch ${argument ?? ''}`.trim());
+      await job.done;
+      if (job.status === 'error') return `FETCH FAILED: ${job.result}`;
+      const logText = job.log.join('');
+      const fetchedTitle = logText.match(/^Paper: (.+)$/m)?.[1];
+      const paperUrl = logText.match(/^Paper page: (\S+)$/m)?.[1] ?? '';
+      if (fetchedTitle) {
+        threadPaper.set(io.contextKey, fetchedTitle);
+        writeAgentState({ lastPaperTitle: fetchedTitle, lastPaperUrl: paperUrl });
+      }
+      // The fetch output IS the user-facing content — deliver it directly.
+      await io.send(cleanLogForReply(job.log) || job.result || '(no output)');
+      await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).');
+      // "summarize this article" / "explain the method" in the same breath —
+      // chain the full-text summary when a PDF was actually saved (a
+      // paywalled paper already got its abstract summary from the fetch).
+      if (fetchedTitle && /\b(summar(y|ise|ize)|explain|method|approach|how does|why)\b/i.test(text)) {
+        const slug = bot.slugifyFile(fetchedTitle);
+        if (existsSync(join(repo, 'runtime/papers', `${slug}.pdf`))) {
+          await io.send('⏳ summarizing the fetched paper…');
+          const sumJob = runner.submit(`summarize ${slug}`);
+          await sumJob.done;
+          const sumOut = cleanLogForReply(sumJob.log) || sumJob.result || '';
+          if (sumJob.status === 'done' && sumOut) await io.send(sumOut);
+          return `Fetched "${fetchedTitle}" and appended the full-text summary above.`;
+        }
+        return `Fetched "${fetchedTitle}" (no open-access PDF — the abstract summary above is all that is available).`;
+      }
+      return `Fetched "${fetchedTitle ?? '?'}". Output already delivered to the user.`;
+    }
+    case 'summarize_pdf': {
+      const job = runner.submit(`summarize ${argument}`.trim());
+      await job.done;
+      const out = cleanLogForReply(job.log) || job.result || '(no output)';
+      if (job.status !== 'done') return `SUMMARIZE FAILED: ${job.result}`;
+      await io.send(out);
+      return 'Summary delivered to the user.';
+    }
+    case 'corpus_search': {
+      const hits = bot.search(corpus, argument || '').slice(0, 5);
+      if (!hits.length) return 'No corpus matches.';
+      return hits.map((h, i) => `[${i + 1}] ${h.title}\n    (${h.category}${h.sourceUrl ? ` · ${h.sourceUrl}` : ''})`).join('\n');
+    }
+    case 'web_search':
+      return webResearch(argument, chat, io);
+    case 'github_repo':
+      return githubRepoSummary(argument, chat);
+    case 'zotero_save': {
+      const job = runner.submit(`zotero ${readAgentState().lastPaperUrl ?? ''}`.trim());
+      await job.done;
+      const out = cleanLogForReply(job.log) || job.result || '(no output)';
+      if (job.status !== 'done') return `ZOTERO FAILED: ${job.result}`;
+      await io.send(out);
+      return 'Zotero result delivered to the user.';
+    }
+    case 'ris_file': {
+      const job = runner.submit(`ris ${readAgentState().lastPaperUrl ?? ''}`.trim());
+      await job.done;
+      const out = cleanLogForReply(job.log) || job.result || '(no output)';
+      if (job.status !== 'done') return `RIS FAILED: ${job.result}`;
+      await io.send(out);
+      return 'RIS result delivered to the user.';
+    }
+    default:
+      return `UNKNOWN TOOL "${tool}" — pick one from the list.`;
+  }
 }
 
 function cleanLogForReply(log) {
@@ -513,113 +590,51 @@ export async function agentHandle(text, io) {
   const chat = (messages, options) => bot.chat(messages, options);
   io.contextTitle = threadPaper.get(io.contextKey) ?? '';
   const history = typeof io.fetchHistory === 'function' ? await io.fetchHistory() : '';
-  let route = await classify(text, io.contextTitle, chat, history);
+  const state = readAgentState();
 
-  // A digest paper by title must go to the paper pipeline even when the
-  // message is phrased as a question ("explain the method…") — the LLM
-  // router alone misroutes those to web search. A strong corpus title
-  // match decides deterministically.
-  if (!['fetch', 'summarize', 'zotero', 'ris'].includes(route.action)) {
+  const contextBlock =
+    `Last fetched paper: ${io.contextTitle || state.lastPaperTitle || '(none)'}`
+    + (state.lastPaperUrl ? `\nIts link: ${state.lastPaperUrl}` : '')
+    + (history ? `\n\nThread context:\n${clip(history, 1400)}` : '')
+    + `\n\nUser message: ${text}`;
+
+  const messages = [
+    { role: 'system', content: `${AGENT_SYSTEM}\n\n${TOOL_SPEC}` },
+    { role: 'user', content: contextBlock },
+  ];
+
+  let acked = false;
+  for (let step = 1; step <= 6; step++) {
+    const raw = await chat(messages, { maxTokens: 320, temperature: 0 });
+    const decision = parseDecision(raw);
+
+    if (decision.answer !== undefined) {
+      if (decision.answer.trim()) await io.send(decision.answer);
+      return;
+    }
+    if (!decision.tool) {
+      if (raw.trim()) await io.send(raw);
+      return;
+    }
+
+    const label = `⏳ ${decision.tool}${decision.argument ? `: ${clip(decision.argument, 100)}` : ''}…`;
+    if (!acked) { await io.ack(label); acked = true; }
+    else await io.progress(label);
+
+    let output;
     try {
-      const top = bot.search(corpus, text)[0];
-      if (top && bot.relevanceScore({ title: top.title }, text) >= 0.6) {
-        route = { action: 'fetch', argument: text };
-      }
-    } catch {
-      /* routing fallback — keep the LLM's choice */
+      output = await runTool(decision.tool, decision.argument, { text, bot, corpus, chat, io });
+    } catch (error) {
+      output = `TOOL ERROR: ${error.message}`;
     }
-  }
 
-  await io.ack(`⏳ ${route.action}${route.argument ? `: ${clip(route.argument, 120)}` : ''}…`);
-
-  if (route.action === 'github') {
-    const reply = await githubRepoSummary(route.argument || text, chat);
-    await io.send(reply);
-    return;
+    messages.push({ role: 'assistant', content: raw });
+    messages.push({
+      role: 'user',
+      content: `TOOL RESULT (${decision.tool}):\n${clip(output, 2800)}\n\nDecide the next step: call another tool if the request needs it, or reply with {"answer":"..."} to finish. The answer must not repeat output already delivered — synthesize or add next steps.`,
+    });
   }
-  if (route.action === 'web') {
-    const reply = await webResearch(route.argument || text, chat, io, history);
-    await io.send(reply);
-    return;
-  }
-  if (route.action === 'chat') {
-    const reply = await chat(
-      [
-        { role: 'system', content: 'You are the DailyInfo assistant. The user has a daily research digest (papers, AI news, code, resources). Answer helpfully in English; if their message looks like a paper title, offer to fetch it. If they ask you to find something online, say the word "find" and what to search for. If their message refers to earlier thread messages, use them as context.' },
-        { role: 'user', content: `${history ? `Thread context:\n${clip(history, 1200)}\n\n` : ''}Message: ${text}` },
-      ],
-      { maxTokens: 900, temperature: 0.4 },
-    );
-    await io.send(reply);
-    return;
-  }
-  if (route.action === 'summarize') {
-    const lastTitle = threadPaper.get(io.contextKey) ?? readAgentState().lastPaperTitle;
-    if (!lastTitle) { await io.send('No paper fetched in this session yet — send me a paper title or link first.'); return; }
-    await io.send(`📌 summarizing the last fetched paper: ${lastTitle}`);
-  }
-
-  if (runner.busy()) { await io.send('⏳ another job is still running — try again in a moment.'); return; }
-  const summarizeTarget = route.action === 'summarize' ? threadPaper.get(io.contextKey) ?? readAgentState().lastPaperTitle : null;
-  const command = route.action === 'summarize'
-    ? `summarize ${bot.slugifyFile(summarizeTarget ?? '')}`
-    : `${route.action} ${route.argument ?? ''}`.trim();
-  const job = runner.submit(command);
-  io.contextTitle = io.contextTitle ?? '';
-
-  // Stream progress into the thread while the job runs.
-  const progressTimer = setInterval(async () => {
-    try {
-      const tail = job.log.join('').split('\n').filter(Boolean).slice(-2).join('\n');
-      if (tail) await io.progress(tail);
-    } catch {
-      /* cosmetic */
-    }
-  }, PROGRESS_EDIT_MS);
-  try {
-    await job.done;
-  } finally {
-    clearInterval(progressTimer);
-  }
-
-  const reply = cleanLogForReply(job.log) || job.result || '(no output)';
-  if (job.status === 'error') {
-    await io.send(`⚠️ ${job.result}`);
-    return;
-  }
-  const chunks = chunkText(reply);
-  for (const chunk of chunks) await io.send(chunk);
-  if (route.action === 'fetch') {
-    // The hot-reloaded job module loses its internal state between jobs —
-    // recover the fetched paper title from the log for per-thread context.
-    const logText = job.log.join('');
-    const fetchedTitle = logText.match(/^Paper: (.+)$/m)?.[1]
-      ?? bot.getLastFetchedPaper()?.title;
-    const paperUrl = logText.match(/^Paper page: (\S+)$/m)?.[1] ?? '';
-    if (fetchedTitle) {
-      threadPaper.set(io.contextKey, fetchedTitle);
-      io.contextTitle = fetchedTitle;
-      writeAgentState({ lastPaperTitle: fetchedTitle, lastPaperUrl: paperUrl });
-    }
-    await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).');
-    // "summarize this article" / "explain the method" in the same breath —
-    // fetch, then summarize in one go (only possible when a PDF was actually
-    // saved; a paywalled paper already got its abstract summary).
-    if (fetchedTitle && /\b(summar(y|ise|ize)|explain|method|approach|how does|why)\b/i.test(text)) {
-      const slug = bot.slugifyFile(fetchedTitle);
-      if (existsSync(join(repo, 'runtime/papers', `${slug}.pdf`))) {
-        await io.send('⏳ summarizing the fetched paper…');
-        const sumJob = runner.submit(`summarize ${slug}`);
-        await sumJob.done;
-        if (sumJob.status === 'done') {
-          const sumReply = cleanLogForReply(sumJob.log) || sumJob.result || '';
-          if (sumReply) await io.send(sumReply);
-        } else {
-          await io.send(`⚠️ summary failed: ${sumJob.result}`);
-        }
-      }
-    }
-  }
+  await io.send('(step limit reached — tell me to continue if the task needs more)');
 }
 
 // ---------------------------------------------------------------------------
