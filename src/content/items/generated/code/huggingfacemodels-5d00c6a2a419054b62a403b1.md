@@ -15,5 +15,5 @@ summary: "视频数字人模型，主打长视频 Avatar 生成与口型表情�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
 ---

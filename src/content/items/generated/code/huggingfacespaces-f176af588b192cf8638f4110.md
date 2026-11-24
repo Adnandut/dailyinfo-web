@@ -9,11 +9,11 @@ source:
   external_id: "Lakonik/pi-H3"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-24T03:45:31.672162+08:00"
+retrieved_at: "2026-11-25T03:45:30.829881+08:00"
 published_at: "2026-11-24T03:45:39.854026+08:00"
-summary: "Lakonik/pi-H3 — 以Gradio封装的π-H3交互演示，聚焦H3模型能力的快速体验与可视化调用。"
+summary: "以 π-H3 为核心的 Gradio 交互应用，提供 H3 相关模型或工具的快速试用入口。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-24"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25"]
 ---

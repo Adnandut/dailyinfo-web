@@ -9,11 +9,11 @@ source:
   external_id: "MiniMaxAI/minimax-h3-image"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-24T03:45:31.672162+08:00"
+retrieved_at: "2026-11-25T03:45:30.829881+08:00"
 published_at: "2026-11-13T08:38:21.049658+08:00"
-summary: "MiniMaxAI/minimax-h3-image — MiniMax H3图像生成Gradio演示，突出高质量图像创作与快速可视化体验。"
+summary: "MiniMax H3 图像生成能力的交互式 Gradio 演示，聚焦高质量图像创作与快速试用。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

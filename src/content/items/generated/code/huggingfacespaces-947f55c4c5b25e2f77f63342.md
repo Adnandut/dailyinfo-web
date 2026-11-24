@@ -9,11 +9,11 @@ source:
   external_id: "waitinghere/Krea2T-Revamped"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-24T03:45:31.672162+08:00"
+retrieved_at: "2026-11-25T03:45:30.829881+08:00"
 published_at: "2026-11-19T03:47:39.415378+08:00"
-summary: "waitinghere/Krea2T-Revamped — Krea2T改进版Gradio应用，优化文本到图像生成工作流与交互体验。"
+summary: "Krea2T 的增强版 Gradio 文本生成图像应用，优化生成流程与参数体验。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

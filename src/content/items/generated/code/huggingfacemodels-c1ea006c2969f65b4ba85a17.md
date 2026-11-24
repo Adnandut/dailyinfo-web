@@ -15,5 +15,5 @@ summary: "Edge0-145B 采用 NVFP4 量化的文本生成大模型，聚焦超大�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20"]
 ---

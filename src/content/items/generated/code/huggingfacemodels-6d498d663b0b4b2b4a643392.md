@@ -9,11 +9,11 @@ source:
   external_id: "Lightricks/LTX-2.5"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-24T03:45:12.556085+08:00"
+retrieved_at: "2026-11-25T03:45:14.010315+08:00"
 published_at: "2026-10-01T08:19:18.900600+08:00"
-summary: "图生视频模型，主打高质量动态视频生成与强社区采用。"
+summary: "高热度图生视频模型，主打高质量动态视频生成与强可控性。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

@@ -14,5 +14,5 @@ summary: "相关教师或单位需按通知申报优质课程资源上线国家�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23"]
+briefing_ids: ["resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23"]
 ---

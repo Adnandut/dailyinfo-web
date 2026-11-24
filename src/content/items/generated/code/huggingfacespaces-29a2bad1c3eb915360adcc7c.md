@@ -9,11 +9,11 @@ source:
   external_id: "cfahlgren1/slack-moji"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-24T03:45:31.672162+08:00"
+retrieved_at: "2026-11-25T03:45:30.829881+08:00"
 published_at: "2026-11-19T03:47:39.415378+08:00"
-summary: "cfahlgren1/slack-moji — 面向Slack的emoji生成静态应用，可快速制作自定义表情并简化团队表情包工作流。"
+summary: "静态 Slack 表情包生成工具，可快速制作并导出自定义 emoji。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24"]
+briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

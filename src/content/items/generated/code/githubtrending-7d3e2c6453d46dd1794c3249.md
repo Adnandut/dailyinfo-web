@@ -15,5 +15,5 @@ summary: "以编译时优化简化 Web 开发的框架，让开发者用更少�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-19"]
 ---

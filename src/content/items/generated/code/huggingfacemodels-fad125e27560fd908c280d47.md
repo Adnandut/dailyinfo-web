@@ -9,11 +9,11 @@ source:
   external_id: "SulphurAI/Sulphur-3"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-24T03:45:12.556085+08:00"
+retrieved_at: "2026-11-25T03:45:14.010315+08:00"
 published_at: "2026-11-24T03:45:39.854026+08:00"
-summary: "高关注度开源模型，面向通用生成式 AI 场景提供可扩展模型能力。"
+summary: "SulphurAI 第三代通用生成模型，主打性能与易用性平衡。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-24"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25"]
 ---

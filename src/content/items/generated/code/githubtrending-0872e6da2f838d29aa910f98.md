@@ -15,5 +15,5 @@ summary: "面向 Claude Code、Codex、Opencode、Cursor 等的 Agent 运行框�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-18", "code-2026-11-19"]
+briefing_ids: ["code-2026-11-19"]
 ---

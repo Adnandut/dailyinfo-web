@@ -14,5 +14,5 @@ summary: "相关教学单位和教师需按通知要求征集并报送“双千�
 why_it_matters: null
 tags: ["微专业", "教学通知"]
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-18", "resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23", "resource-2026-11-24"]
+briefing_ids: ["resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23", "resource-2026-11-24"]
 ---
