@@ -481,6 +481,10 @@ const TOOL_SPEC = [
   '{"tool":"zotero_save","argument":""}',
   '{"tool":"ris_file","argument":""}',
   '{"tool":"use_skill","argument":"<skill-name> [: extra details]"}',
+  '{"tool":"weekly_draft","argument":""}',
+  '{"tool":"read_weekly_draft","argument":"<optional date, empty = latest>"}',
+  '{"tool":"long_write","argument":"<filename (in runtime/briefings/weekly/) to write the generated article to>"}',
+  '{"tool":"post_article","argument":"<channel name, default ai-news>"}',
   '{"answer":"<final reply to the user>"}',
 ].join('\n');
 
@@ -510,13 +514,14 @@ function loadSkills() {
 }
 
 /** Parse {"tool":...}|{"answer":...} out of a possibly chatty LLM reply. */
-function parseDecision(raw) {
+export function parseDecision(raw) {
   const cleaned = String(raw ?? '').replace(/```json|```/g, '').trim();
   const start = cleaned.indexOf('{');
   if (start >= 0) {
-    for (let end = cleaned.length; end > start; end--) {
+    const jsonish = cleaned.slice(start);
+    for (let end = jsonish.length; end > 1; end--) {
       try {
-        const parsed = JSON.parse(cleaned.slice(start, end));
+        const parsed = JSON.parse(jsonish.slice(0, end));
         if (parsed && typeof parsed === 'object') {
           if (parsed.answer !== undefined) return { answer: String(parsed.answer) };
           if (parsed.tool) return { tool: String(parsed.tool), argument: parsed.argument == null ? '' : String(parsed.argument) };
@@ -525,12 +530,24 @@ function parseDecision(raw) {
         /* shrink the window and retry */
       }
     }
+    // LLMs emit multi-line answer strings (raw newlines = invalid JSON).
+    // Recover the payload leniently instead of leaking the wrapper.
+    const answerMatch = jsonish.match(/^\{\s*"answer"\s*:\s*"([\s\S]*)"\s*\}?\s*$/);
+    if (answerMatch) {
+      return {
+        answer: answerMatch[1]
+          .replace(/\\n/g, '\n')
+          .replace(/\\"/g, '"')
+          .replace(/\\t/g, '\t')
+          .replace(/\\\\/g, '\\'),
+      };
+    }
   }
   return { answer: cleaned || '(no output)' };
 }
 
 async function runTool(tool, argument, ctx) {
-  const { text, bot, corpus, chat, io } = ctx;
+  const { text, bot, corpus, chat, io, messages } = ctx;
   switch (tool) {
     case 'fetch_paper': {
       if (runner.busy()) return 'BUSY: another job is still running — wait a moment, then continue.';
@@ -615,6 +632,60 @@ async function runTool(tool, argument, ctx) {
         details ? `\nUser request details for this skill: ${details}` : '',
       ].join('\n');
     }
+    case 'weekly_draft': {
+      if (runner.busy()) return 'BUSY: another job is still running — wait a moment, then continue.';
+      const job = runner.submit('weekly');
+      await job.done;
+      const out = cleanLogForReply(job.log) || job.result || '(no output)';
+      if (job.status !== 'done') return `WEEKLY DRAFT FAILED: ${job.result}`;
+      await io.send(out);
+      return 'Weekly draft generated and the path was delivered to the user. Read it with read_weekly_draft.';
+    }
+    case 'read_weekly_draft': {
+      const dir = join(repo, 'runtime', 'briefings', 'weekly');
+      if (!existsSync(dir)) return 'NO WEEKLY DRAFTS — call weekly_draft first.';
+      const wanted = String(argument ?? '').trim();
+      const file = readdirSync(dir)
+        .filter((f) => f.startsWith('weekly_recap_') && f.endsWith('.md') && !f.includes('_polished') && (!wanted || f.includes(wanted)))
+        .sort()
+        .pop();
+      if (!file) return 'NO WEEKLY DRAFTS — call weekly_draft first.';
+      return `DRAFT FILE: ${file}\n\n${readFileSync(join(dir, file), 'utf8')}`;
+    }
+    case 'long_write': {
+      // Long-form generation for skill rewrites: the loop's decision JSON is
+      // too small for whole articles, so this tool generates from the full
+      // conversation context with a large budget and writes the file.
+      const generated = await chat(
+        [...messages, { role: 'user', content: 'Now produce the FINAL article exactly as instructed. Output ONLY the article markdown — no commentary, no code fences.' }],
+        { maxTokens: 4000, temperature: 0.3 },
+      );
+      const safeName = (String(argument ?? '').trim() || `weekly_recap_${new Date().toISOString().slice(0, 10)}_polished.md`)
+        .replace(/[^\w.-]/g, '');
+      const outDir = join(repo, 'runtime', 'briefings', 'weekly');
+      mkdirSync(outDir, { recursive: true });
+      writeFileSync(join(outDir, safeName), `${generated.trim()}\n`, 'utf8');
+      await io.send(`📝 article written: runtime/briefings/weekly/${safeName} (${generated.length} chars)`);
+      return `Article written to runtime/briefings/weekly/${safeName} (${generated.length} chars). It can be posted with post_article.`;
+    }
+    case 'post_article': {
+      const guild = io.message?.guild;
+      if (!guild) return 'NO GUILD: not connected to a server (test environment) — posting skipped.';
+      const channelName = (String(argument ?? '').trim() || 'ai-news').replace(/^#/, '');
+      const channel = guild.channels.cache.find((c) => c.name === channelName && c.isTextBased());
+      if (!channel) return `CHANNEL NOT FOUND: #${channelName}`;
+      const dir = join(repo, 'runtime', 'briefings', 'weekly');
+      const file = existsSync(dir)
+        ? readdirSync(dir).filter((f) => f.includes('_polished')).sort().pop()
+        : null;
+      if (!file) return 'NO POLISHED ARTICLE FOUND — run the polish first.';
+      const content = readFileSync(join(dir, file), 'utf8');
+      const parts = chunkText(content);
+      for (let i = 0; i < parts.length; i++) {
+        await channel.send({ content: `【Part ${i + 1}/${parts.length}】\n${clip(parts[i], MAX_MESSAGE_CHARS - 20)}` });
+      }
+      return `Posted ${parts.length} part(s) of ${file} to #${channelName}.`;
+    }
     default:
       return `UNKNOWN TOOL "${tool}" — pick one from the list.`;
   }
@@ -653,7 +724,8 @@ export async function agentHandle(text, io) {
   ];
 
   let acked = false;
-  for (let step = 1; step <= 6; step++) {
+  let maxSteps = 6;
+  for (let step = 1; step <= maxSteps; step++) {
     const raw = await chat(messages, { maxTokens: 320, temperature: 0 });
     const decision = parseDecision(raw);
 
@@ -666,21 +738,27 @@ export async function agentHandle(text, io) {
       return;
     }
 
+    // Skills drive long multi-phase workflows — give them headroom.
+    if (decision.tool === 'use_skill') maxSteps = Math.max(maxSteps, 14);
+
     const label = `⏳ ${decision.tool}${decision.argument ? `: ${clip(decision.argument, 100)}` : ''}…`;
     if (!acked) { await io.ack(label); acked = true; }
     else await io.progress(label);
 
     let output;
     try {
-      output = await runTool(decision.tool, decision.argument, { text, bot, corpus, chat, io });
+      output = await runTool(decision.tool, decision.argument, { text, bot, corpus, chat, io, messages });
     } catch (error) {
       output = `TOOL ERROR: ${error.message}`;
     }
 
     messages.push({ role: 'assistant', content: raw });
+    // Skill instructions must arrive intact (they are the procedure) — other
+    // tool results stay clipped to keep the loop lean.
+    const observationClip = decision.tool === 'use_skill' ? 24_000 : 2_800;
     messages.push({
       role: 'user',
-      content: `TOOL RESULT (${decision.tool}):\n${clip(output, 2800)}\n\nDecide the next step: call another tool if the request needs it, or reply with {"answer":"..."} to finish. The answer must not repeat output already delivered — synthesize or add next steps.`,
+      content: `TOOL RESULT (${decision.tool}):\n${clip(output, observationClip)}\n\nDecide the next step: call another tool if the request needs it, or reply with {"answer":"..."} to finish. The answer must not repeat output already delivered — synthesize or add next steps.`,
     });
   }
   await io.send('(step limit reached — tell me to continue if the task needs more)');

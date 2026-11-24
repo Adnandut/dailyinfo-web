@@ -1154,6 +1154,50 @@ function papersCommand() {
     console.log('Import into Mendeley: drag the file onto the Mendeley window (or File -> Import).\n');
   }
 
+
+/** First-pass weekly AI-news recap: the last 7 daily ai_news briefings are
+ * compressed into one Chinese draft article (the polish skill's input). */
+async function weeklyCommand() {
+  const dates = (existsSync(cacheDir) ? readdirSync(cacheDir) : [])
+    .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && existsSync(join(cacheDir, d, 'ai_news.md')))
+    .sort()
+    .slice(-7);
+  if (!dates.length) throw new Error('No daily ai_news briefings found under runtime/bot-cache/en — run the daily update first.');
+  const sources = dates.map((d) => {
+    const raw = readFileSync(join(cacheDir, d, 'ai_news.md'), 'utf8');
+    return '===== ' + d + ' =====\n' + raw.replace(/^---[\s\S]*?---\n?/, '').trim();
+  }).join('\n\n');
+  process.stdout.write('[agent] drafting the weekly recap from ' + dates.length + ' daily briefings (' + dates[0] + ' → ' + dates[dates.length - 1] + ')…\n');
+  const draft = await chat(
+    [
+      {
+        role: 'system',
+        content:
+          'You are an AI-news weekly editor writing for Chinese readers. Compress the daily briefings below into a FIRST-PASS weekly recap in Chinese.\n'
+          + 'Use exactly this structure:\n'
+          + '# AI 周报（' + dates[0] + ' ~ ' + dates[dates.length - 1] + '）\n'
+          + '## 导读\n(3-5 bullets; lead with the week\'s most consequential story)\n'
+          + '## 🧠 模型进展\n## 🤖 Agent/产品进展\n## 🔬 AI for Science\n## 🏭 产业新闻\n\n'
+          + 'Rules:\n'
+          + '- Merge cross-day evolutions of the same story into one item; keep every specific number (prices, benchmark scores, funding amounts).\n'
+          + '- Keep model/company names exactly as written (GPT-6.2 Astra, MAI Code 2, Qwen …) — never replace a name with a vague description.\n'
+          + '- 1-3 lines per item; no filler phrases (值得注意的是/此外/综上所述); no calendar-style date openings.\n'
+          + '- End with a line: 信息来源：dailyinfo 每日简报（' + dates[0] + ' ~ ' + dates[dates.length - 1] + '），原始新闻来自 Latent Space AINews。\n'
+          + 'Output ONLY the article markdown.',
+      },
+      { role: 'user', content: sources.slice(0, 60_000) },
+    ],
+    { maxTokens: 4000, temperature: 0.3 },
+  );
+  const outDir = join(repo, 'runtime', 'briefings', 'weekly');
+  mkdirSync(outDir, { recursive: true });
+  const outPath = join(outDir, 'weekly_recap_' + dates[dates.length - 1] + '.md');
+  writeFileSync(outPath, draft.trim() + '\n', 'utf8');
+  console.log('\nWeekly recap draft written: ' + outPath);
+  console.log('Days covered: ' + dates.join(', '));
+  console.log('(next: ask the agent to polish it — 润色AI周报)');
+}
+
 // ---------------------------------------------------------------------------
 // CLI / REPL
 // ---------------------------------------------------------------------------
@@ -1288,6 +1332,9 @@ async function runCommand(corpus, input) {
         return true;
       case 'ris':
         await risCommand(argument);
+        return true;
+        case 'weekly':
+        await weeklyCommand();
         return true;
     case 'exit':
     case 'quit':
