@@ -1173,16 +1173,16 @@ async function weeklyCommand() {
       {
         role: 'system',
         content:
-          'You are an AI-news weekly editor writing for Chinese readers. Compress the daily briefings below into a FIRST-PASS weekly recap in Chinese.\n'
+          'You are an AI-news weekly editor. Compress the daily briefings below into a FIRST-PASS weekly recap in English.\n'
           + 'Use exactly this structure:\n'
-          + '# AI 周报（' + dates[0] + ' ~ ' + dates[dates.length - 1] + '）\n'
-          + '## 导读\n(3-5 bullets; lead with the week\'s most consequential story)\n'
-          + '## 🧠 模型进展\n## 🤖 Agent/产品进展\n## 🔬 AI for Science\n## 🏭 产业新闻\n\n'
+          + '# AI Weekly (' + dates[0] + ' ~ ' + dates[dates.length - 1] + ')\n'
+          + '## TL;DR\n(3-5 bullets; lead with the week\'s most consequential story)\n'
+          + '## 🧠 Model Progress\n## 🤖 Agents & Products\n## 🔬 AI for Science\n## 🏭 Industry News\n\n'
           + 'Rules:\n'
           + '- Merge cross-day evolutions of the same story into one item; keep every specific number (prices, benchmark scores, funding amounts).\n'
           + '- Keep model/company names exactly as written (GPT-6.2 Astra, MAI Code 2, Qwen …) — never replace a name with a vague description.\n'
-          + '- 1-3 lines per item; no filler phrases (值得注意的是/此外/综上所述); no calendar-style date openings.\n'
-          + '- End with a line: 信息来源：dailyinfo 每日简报（' + dates[0] + ' ~ ' + dates[dates.length - 1] + '），原始新闻来自 Latent Space AINews。\n'
+          + '- 1-3 lines per item; no filler phrases ("It is worth noting that", "In addition", "In summary"); no calendar-style date openings — the briefing date is when news was COLLECTED, not when it happened.\n'
+          + '- End with a line: Sources: dailyinfo daily briefings (' + dates[0] + ' ~ ' + dates[dates.length - 1] + '); original news from Latent Space AINews.\n'
           + 'Output ONLY the article markdown.',
       },
       { role: 'user', content: sources.slice(0, 60_000) },
@@ -1195,7 +1195,7 @@ async function weeklyCommand() {
   writeFileSync(outPath, draft.trim() + '\n', 'utf8');
   console.log('\nWeekly recap draft written: ' + outPath);
   console.log('Days covered: ' + dates.join(', '));
-  console.log('(next: ask the agent to polish it — 润色AI周报)');
+  console.log('(next: ask the agent to polish it — "polish weekly recap")');
 }
 
 // ---------------------------------------------------------------------------
