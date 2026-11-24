@@ -548,8 +548,12 @@ const FETCH_TIMEOUT_MS = 45_000;
 // Large open-access PDFs (10MB+) through a proxy need far more than the
 // metadata timeout — a timeout here used to look like "paywalled".
 const PDF_TIMEOUT_MS = Number(process.env.BOT_PDF_TIMEOUT_MS) || 240_000;
-const SUMMARY_CHUNK_CHARS = 3200;
+const SUMMARY_CHUNK_CHARS = Number(process.env.BOT_SUMMARY_CHUNK_CHARS) || 12_000;
 const SUMMARY_MAX_CHUNKS = 14;
+/** Chunk notes are independent — summarize several in parallel (batches keep
+ * free-tier endpoints happy; a 50K-char paper goes from ~15 sequential calls
+ * to 3-4 batches, which is the difference between ~8 min and ~2 min). */
+const SUMMARY_CONCURRENCY = Number(process.env.BOT_SUMMARY_CONCURRENCY) || 7;
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) DailyInfoBot/1.0';
 
 /** In the REPL this is wired to readline; one-shot mode auto-picks. */
@@ -875,18 +879,20 @@ async function summarizeText(text) {
     );
   }
   const notes = [];
-  for (const [index, chunk] of chunks.entries()) {
-    process.stdout.write(`\r[agent] reading part ${index + 1}/${chunks.length}Ã¢â‚¬Â¦`);
+  const notePrompt = (chunk) => [
+    { role: 'system', content: SUMMARIZE_SYSTEM },
+    { role: 'user', content: `Extract the key claims, methods and numbers from this section of a paper. Be terse bullet points.\n\n${chunk}` },
+  ];
+  for (let index = 0; index < chunks.length; index += SUMMARY_CONCURRENCY) {
+    const batch = chunks.slice(index, index + SUMMARY_CONCURRENCY);
+    process.stdout.write(`[agent] reading parts ${index + 1}-${index + batch.length}/${chunks.length}…\n`);
     if (index) await pace();
-    notes.push(await chat(
-      [
-        { role: 'system', content: SUMMARIZE_SYSTEM },
-        { role: 'user', content: `Extract the key claims, methods and numbers from this section of a paper. Be terse bullet points.\n\n${chunk}` },
-      ],
-      { maxTokens: 1200, temperature: 0.2 },
-    ));
+    const batchNotes = await Promise.all(batch.map((chunk) => chat(
+      notePrompt(chunk),
+      { maxTokens: 700, temperature: 0.2 },
+    )));
+    notes.push(...batchNotes);
   }
-  process.stdout.write('\n');
   return chat(
     [
       { role: 'system', content: SUMMARIZE_SYSTEM },
@@ -1408,4 +1414,5 @@ export {
   getLastFetchedPaper,
   slugifyFile,
   chat,
+  extractPdfText,
 };
