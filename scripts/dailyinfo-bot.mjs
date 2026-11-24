@@ -846,7 +846,9 @@ async function findOpenPdf(paper) {
 
 async function extractPdfText(filePath) {
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  const doc = await pdfjs.getDocument({ data: new Uint8Array(readFileSync(filePath)), useSystemFonts: false }).promise;
+  // verbosity 0: suppress pdf.js warnings (standardFontDataUrl noise) — they
+  // are cosmetic and were leaking into agent replies in Discord.
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(readFileSync(filePath)), useSystemFonts: false, verbosity: 0 }).promise;
   const pages = [];
   for (let index = 1; index <= doc.numPages; index++) {
     const page = await doc.getPage(index);
