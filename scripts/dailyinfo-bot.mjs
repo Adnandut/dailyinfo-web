@@ -1141,20 +1141,34 @@ function papersCommand() {
     console.log('');
   }
 
-  async function zoteroCommand() {
-    const paper = getLastFetchedPaper();
+  async function zoteroCommand(argument = '') {
+    let paper = getLastFetchedPaper();
+    if (!paper && argument) {
+      // Agent front-ends lose in-memory session state between jobs - the
+      // Discord agent passes the paper's DOI/landing link instead.
+      process.stdout.write('[agent] resolving paper from the saved link...\n');
+      const resolved = await resolvePaperUrl(argument.trim());
+      paper = resolved[0];
+    }
     if (!paper) throw new Error('No paper fetched in this session yet Ã¢â‚¬â€ run fetch first.');
     const { saveToZoteroLocal, pingZotero } = await import('./zotero.mjs');
     if (!(await pingZotero())) {
-      console.log('\nZotero is not running. Open the Zotero desktop app, then run: zotero\n');
+      console.log('\nZotero is not running — open the Zotero desktop app on this PC, then say "zotero" again.\n');
       return;
     }
     const outcome = await saveToZoteroLocal(paper);
     console.log(`\n${outcome.message}\n`);
   }
 
-  async function risCommand() {
-    const paper = getLastFetchedPaper();
+  async function risCommand(argument = '') {
+    let paper = getLastFetchedPaper();
+    if (!paper && argument) {
+      // Agent front-ends lose in-memory session state between jobs - the
+      // Discord agent passes the paper's DOI/landing link instead.
+      process.stdout.write('[agent] resolving paper from the saved link...\n');
+      const resolved = await resolvePaperUrl(argument.trim());
+      paper = resolved[0];
+    }
     if (!paper) throw new Error('No paper fetched in this session yet Ã¢â‚¬â€ run fetch first.');
     const { writeRis } = await import('./zotero.mjs');
     const path = writeRis(paper);

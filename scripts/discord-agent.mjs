@@ -474,6 +474,7 @@ const AGENT_SYSTEM =
   + '• "what\'s in today\'s digest" style questions about their own feed → corpus_search. '
   + '• Multi-step requests ("find X and save it to Zotero") → plan the minimal tool sequence yourself. '
   + '• zotero_save needs the Zotero desktop app open on this PC; if the result says it is not running, tell the user to open it and say "zotero" again. '
+  + '• Citation saving works for ANY fetched paper — paywalled or not. Metadata (title/authors/DOI) is enough; NEVER suggest manual citation entry or make PDF availability a condition for saving. '
   + '• Small talk or anything needing no tool → reply with {"answer": "..."} immediately. '
   + '• Recurring multi-step workflows have SKILLS — if one matches the request, call use_skill and then follow its instructions step by step with the other tools. '
   + '• Tool output already delivered to the user must NOT be repeated in the final answer — synthesize, add next steps, or keep the answer to one line.';
@@ -603,6 +604,9 @@ async function runTool(tool, argument, ctx) {
       const out = cleanLogForReply(job.log) || job.result || '(no output)';
       if (job.status !== 'done') return `ZOTERO FAILED: ${job.result}`;
       await io.send(out);
+      if (/not running/i.test(out)) {
+        return 'ZOTERO DESKTOP NOT RUNNING. Tell the user exactly this and nothing else: open the Zotero desktop app on this PC, then say "zotero" again. Do not fetch, do not retry, do not suggest manual citation entry.';
+      }
       return 'Zotero result delivered to the user.';
     }
     case 'ris_file': {
