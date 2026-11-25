@@ -475,6 +475,7 @@ const AGENT_SYSTEM =
   + '• Multi-step requests ("find X and save it to Zotero") → plan the minimal tool sequence yourself. '
   + '• zotero_save needs the Zotero desktop app open on this PC; if the result says it is not running, tell the user to open it and say "zotero" again. '
   + '• Citation saving works for ANY fetched paper — paywalled or not. Metadata (title/authors/DOI) is enough; NEVER suggest manual citation entry or make PDF availability a condition for saving. '
+  + '• Ordinal references ("article number 2", "the second paper", "paper #3") resolve against the numbered list in the thread context: identify that item\'s exact TITLE and call fetch_paper with it. Never echo a digest part back and never search for strings like "part 18". '
   + '• Small talk or anything needing no tool → reply with {"answer": "..."} immediately. '
   + '• Recurring multi-step workflows have SKILLS — if one matches the request, call use_skill and then follow its instructions step by step with the other tools. '
   + '• Tool output already delivered to the user must NOT be repeated in the final answer — synthesize, add next steps, or keep the answer to one line.';
@@ -521,7 +522,10 @@ function loadSkills() {
   }
 }
 
-/** Parse {"tool":...}|{"answer":...} out of a possibly chatty LLM reply. */
+/** Parse {"tool":...}|{"answer":...} out of a possibly chatty LLM reply.
+ * Handles three failure shapes seen in the wild: chatty wrappers, raw
+ * newlines inside strings, and JSON truncated by the token cap (unclosed
+ * string — recover the payload instead of leaking the wrapper). */
 export function parseDecision(raw) {
   const cleaned = String(raw ?? '').replace(/```json|```/g, '').trim();
   const start = cleaned.indexOf('{');
@@ -538,17 +542,23 @@ export function parseDecision(raw) {
         /* shrink the window and retry */
       }
     }
+    const unescape = (s) => s
+      .replace(/\\n/g, '\n')
+      .replace(/\\"/g, '"')
+      .replace(/\\t/g, '\t')
+      .replace(/\\\\/g, '\\');
     // LLMs emit multi-line answer strings (raw newlines = invalid JSON).
-    // Recover the payload leniently instead of leaking the wrapper.
     const answerMatch = jsonish.match(/^\{\s*"answer"\s*:\s*"([\s\S]*)"\s*\}?\s*$/);
-    if (answerMatch) {
-      return {
-        answer: answerMatch[1]
-          .replace(/\\n/g, '\n')
-          .replace(/\\"/g, '"')
-          .replace(/\\t/g, '\t')
-          .replace(/\\\\/g, '\\'),
-      };
+    if (answerMatch) return { answer: unescape(answerMatch[1]) };
+    // Truncated by the token cap: unclosed string — take what is there.
+    if (/^\{\s*"answer"\s*:/.test(jsonish)) {
+      const payload = jsonish.replace(/^\{\s*"answer"\s*:\s*"/, '').replace(/"\s*\}?[\s.]*$/, '');
+      return { answer: unescape(payload) };
+    }
+    if (/^\{\s*"tool"\s*:/.test(jsonish)) {
+      const tool = jsonish.match(/"tool"\s*:\s*"([^"]+)"/)?.[1];
+      const arg = jsonish.match(/"argument"\s*:\s*"([\s\S]*)"/)?.[1];
+      if (tool) return { tool, argument: arg ? unescape(arg.replace(/"\s*\}?[\s.]*$/, '')) : '' };
     }
   }
   return { answer: cleaned || '(no output)' };
@@ -725,7 +735,9 @@ export async function agentHandle(text, io) {
   let acked = false;
   let maxSteps = 6;
   for (let step = 1; step <= maxSteps; step++) {
-    const raw = await chat(messages, { maxTokens: 320, temperature: 0 });
+    // 900 tokens: long answers (a digest part, a short recap) must fit — a
+    // truncated decision JSON used to leak raw into the chat.
+    const raw = await chat(messages, { maxTokens: 900, temperature: 0 });
     const decision = parseDecision(raw);
 
     if (decision.answer !== undefined) {
