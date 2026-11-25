@@ -79,7 +79,10 @@ function extractSections(body) {
   const lines = body.split(/\r?\n/);
   let current = null;
   for (const line of lines) {
-    const heading = line.match(/^#{2,3}\s+(.+?)\s*$/);
+    // h1-h3 all count as section headers: the code and resource briefings use
+    // "# GitHub Trending - <date>"-style h1 headings, and an empty leading
+    // section (the document title) drops itself via the summary check below.
+    const heading = line.match(/^#{1,3}\s+(.+?)\s*$/);
     if (heading) {
       if (current && current.summary.trim()) sections.push(current);
       current = { title: cleanHeading(heading[1]), summary: '' };
@@ -192,9 +195,14 @@ async function main() {
         }
       }
       console.log(`[discord] ${category.label}: ${parts.length} part post(s) → ${pageUrl(date, category)}`);
-      already.add(category.id);
-      posted[date] = [...already].sort();
-      postedSomething = true;
+      // Mark the category as posted ONLY when something actually went out —
+      // a 0-part extraction (heading-level mismatch) used to be marked as
+      // posted, silently swallowing the category for that day.
+      if (parts.length > 0) {
+        already.add(category.id);
+        posted[date] = [...already].sort();
+        postedSomething = true;
+      }
     } catch (error) {
       console.error(`[discord] ${category.label}: FAILED — ${error.message}`);
       process.exitCode = 1;
