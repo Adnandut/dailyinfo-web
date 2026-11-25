@@ -9,11 +9,11 @@ source:
   external_id: "JCisHERE/wan2-2-i2v-v3"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-25T03:45:30.829881+08:00"
+retrieved_at: "2026-11-26T03:45:29.533701+08:00"
 published_at: "2026-10-31T03:45:55.076017+08:00"
-summary: "基于 Wan2.2 的图像到视频生成 Gradio 应用，提供一键式图生视频体验并迭代至 v3。"
+summary: "基于Wan2.2的图像转视频Gradio应用，提供便捷的图生视频生成与预览体验。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
 ---

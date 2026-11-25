@@ -9,11 +9,11 @@ source:
   external_id: "harness-hub/Qwen3.8-27B-pi-adapted"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-25T03:45:14.010315+08:00"
+retrieved_at: "2026-11-26T03:45:11.100726+08:00"
 published_at: "2026-11-19T03:47:39.415378+08:00"
-summary: "基于 Qwen3.8-27B 适配的多模态模型，面向特定 harness 场景优化图文推理。"
+summary: "Qwen3.8-27B-pi-adapted 是在 Qwen3.8-27B 基础上适配 pi 框架/管线的图文多模态版本，增强特定工具链下的部署与推理兼容性。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
 ---

@@ -9,11 +9,11 @@ source:
   external_id: "jingyaogong/minimind"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-25T03:45:03.383934+08:00"
+retrieved_at: "2026-11-26T03:45:01.734712+08:00"
 published_at: "2026-11-18T03:45:52.649993+08:00"
-summary: "minimind 提供从零训练64M大模型的极简方案，让开发者可在约两小时内完成自己的小型 LLM 训练。"
+summary: "两小时从零训练 64M 大模型，显著降低 LLM 训练门槛并提升教学与实验效率。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
 ---
