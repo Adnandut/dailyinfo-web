@@ -14,5 +14,5 @@ summary: "请相关教学单位或教师按通知提交“双千”计划“微�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23", "resource-2026-11-24", "resource-2026-11-25"]
+briefing_ids: ["resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23", "resource-2026-11-24", "resource-2026-11-25"]
 ---

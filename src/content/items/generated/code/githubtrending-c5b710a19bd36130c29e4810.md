@@ -15,5 +15,5 @@ summary: "stitch-skills 是适配 Stitch MCP Server 的 Agent Skills 库，遵�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25"]
 ---

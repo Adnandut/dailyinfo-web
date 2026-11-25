@@ -14,5 +14,5 @@ summary: "请符合条件的青年科学家按通知申请2027年国家自然科
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-19", "resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23", "resource-2026-11-24", "resource-2026-11-25"]
+briefing_ids: ["resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23", "resource-2026-11-24", "resource-2026-11-25"]
 ---

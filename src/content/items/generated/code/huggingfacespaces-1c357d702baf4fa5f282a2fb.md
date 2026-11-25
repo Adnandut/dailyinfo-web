@@ -15,5 +15,5 @@ summary: "集成 Qwen-2.1-Turbo、换脸、MOSS 图像编辑、扩图与细节�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

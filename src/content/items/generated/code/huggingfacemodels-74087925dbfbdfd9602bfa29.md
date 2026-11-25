@@ -15,5 +15,5 @@ summary: "InternLM Sage-S2.1-Flash 快速版模型，聚焦高效推理与低延
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-20"]
 ---

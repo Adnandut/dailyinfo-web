@@ -15,5 +15,5 @@ summary: "通义千问 27B 多模态大模型，主打强图文理解与通用�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

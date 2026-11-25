@@ -15,5 +15,5 @@ summary: "高热度图生视频模型，主打高质量动态视频生成与强�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

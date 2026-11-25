@@ -15,5 +15,5 @@ summary: "面向物理工程领域的专家级评测基准，用于检验模型�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

@@ -15,5 +15,5 @@ summary: "Krea2T 的增强版 Gradio 文本生成图像应用，优化生成流�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
 ---

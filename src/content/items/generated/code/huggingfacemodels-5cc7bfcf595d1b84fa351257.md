@@ -15,5 +15,5 @@ summary: "英伟达 Nemotron 3.5 Bolt 4GB 文本生成模型，主打 4GB 级低
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-19", "code-2026-11-20"]
+briefing_ids: ["code-2026-11-20"]
 ---
