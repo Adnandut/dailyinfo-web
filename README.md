@@ -164,53 +164,90 @@ This fork deploys with `SITE_ORIGIN=https://adnandut.github.io`,
 
 ## DailyInfo Bot & Agent
 
-An optional local assistant (not part of the deployed site) built on top of this repo:
+An optional local assistant (not part of the deployed site) built on top of this repo,
+with three front-ends over one engine:
 
 ```bash
 npm run bot            # interactive CLI
-npm run agent-ui       # web UI → http://127.0.0.1:4323
+npm run agent-ui       # web UI -> http://127.0.0.1:4323
+npm run discord-bot    # conversational Discord agent (owner-only)
 ```
 
-| Command (CLI or web UI) | What it does |
+### Engine commands (CLI, web UI, and the Discord agent share them)
+
+| Command | What it does |
 | --- | --- |
-| `update` | pull the newest upstream content, then translate every briefing day not yet cached |
+| `update` | pull the newest upstream content, translate every briefing day not yet cached, dispatch the cloud deploy |
 | `translate [date] [category]` | English edition of a day's briefings (cached under `runtime/bot-cache/`) |
 | `ask <question>` | Q&A over the local corpus, answered in English with citations |
-| `fetch <query \| url \| doi>` | **paper agent**: search the web (arXiv / Semantic Scholar / Crossref / Unpaywall), download the open-access PDF, extract text, produce a structured summary (Problem / Method / Key results / Limitations / Why it matters) |
+| `fetch <query \| url \| doi>` | **paper agent**: search arXiv / Semantic Scholar / Crossref / Unpaywall, download the open-access PDF, extract text, produce a structured summary (Problem / Method / Key results / Limitations / Why it matters) |
 | `summarize <pdf>` | summarize a PDF from `runtime/papers/` (drop paywalled PDFs there manually) |
+| `weekly` | first-pass weekly AI-news recap from the last 7 daily `ai_news` briefings |
 | `zotero` / `ris` | save the last fetched paper to your Zotero library (local connector) / write a `.ris` citation file for Mendeley |
 
-Notes:
+Summary speed: papers are chunked at 12,000 chars and summarized in parallel batches
+(7 concurrent, terse notes), then merged — an 80K-char arXiv paper summarizes in
+~45 s. Tunable via `BOT_SUMMARY_CHUNK_CHARS` and `BOT_SUMMARY_CONCURRENCY`.
 
-- Requires an LLM key in `.env` (gitignored): `GEMINI_API_KEY` (recommended, largest free
-  tier), `OPENROUTER_API_KEY`, or `GLM_API_KEY`. Optional: `BOT_MODEL`,
-  `BOT_FALLBACK_MODELS`, `UNI_EZPROXY_URL` (one-click university access links for
-  paywalled papers), `UNPAYWALL_EMAIL`.
-- Zotero saving uses the **local connector** (`localhost:23119`) — the same endpoint as
-  the Zotero browser plugin; the desktop app must be running. Mendeley has no public
-  API, so it receives a `.ris` file instead (drag onto the window to import).
-- Saving citations and university access links are **explicit, per-paper actions** —
-  nothing is saved or opened automatically.
-- The English edition is rendered at `/en/` wherever the translation cache exists
-  (locally and on this fork's deployment); on machines without it, `/en/` is empty and
-  the header link is hidden. The canonical publication contract is untouched.
+### Discord agent (`npm run discord-bot`)
+
+A conversational agent: the owner just talks to it — no slash commands. Requires
+`DISCORD_BOT_TOKEN` + `DISCORD_OWNER_NAME` (or `DISCORD_OWNER_ID`) in `.env`, the
+Message Content intent enabled, and an invite with Send Messages / Create Public
+Threads / Send Messages in Threads / Add Reactions.
+
+- **Tool loop, not a command router**: the LLM plans step by step (up to 14 steps) over
+  the tools `fetch_paper`, `summarize_pdf`, `corpus_search`, `web_search`
+  (Sogou -> Bing -> DDG), `github_repo`, `zotero_save`, `ris_file`, `use_skill` —
+  observing each result before deciding the next step. One message like "find this
+  paper and save it to Zotero" becomes fetch -> save -> report on its own.
+- **Liveness signals**: 👀 reaction when your message is seen, ⏳ + "typing…" while
+  working, ✅/⚠️ when finished. Replies land in a thread; long output is chunked to
+  Discord's 2,000-char limit.
+- **Thread context**: the agent reads the thread starter plus recent messages, so a
+  follow-up ("are we still able to apply?") resolves against the notice pasted earlier
+  instead of being answered cold.
+- **Skills** (`skills/*.md`): plain markdown files — a `When:` trigger line plus a
+  procedure. The catalog is re-read every message; a matching skill is invoked
+  mid-loop and followed with the regular tools. Ships with `deep-dive`,
+  `digest-recap`, `compare-papers`; drop in a new file and it works on the next
+  message (no restart, no code).
+- **Honest failure**: paywalled paper -> says so, gives the DOI, points at university
+  (WebVPN) access instead of inventing an answer from weak web results.
+- Runs only while the process is up: auto-starts at logon (Startup folder wrapper)
+  and is revived by the daily task (see below) if it died.
+
+### Proxy & connectivity (single source of truth)
+
+`.env` `HTTPS_PROXY` drives everything — LLM calls, Discord REST, and git operations
+in spawned processes. Notes learned the hard way:
+
+- discord.js's gateway uses the `ws` package, which ignores env proxies — the agent
+  patches `https.request` to inject a proxy agent (`installProxyForWebSocket`).
+- Git has its **own** proxy setting (`git config http.proxy`) that overrides the
+  environment — keep it pointing at the same port as `.env`.
+- A standalone Clash core (`runtime/clash-standalone/`, built from the FlClash
+  subscription profile) serves as a fallback proxy (port 17890) when the FlClash UI
+  proxy is off; its auto-start wrapper is in the Startup folder.
 
 ### Scheduled deployment (this fork — zero-touch)
 
-The pipeline runs itself; no human commands are needed:
-
-- **Windows scheduled task `DailyInfoUpdate`** (on the maintainer's machine): triggers at
-  **07:10 / 09:30 / 12:00 / 21:00** Asia/Shanghai, plus runs on wake if a slot was missed.
-  One command chain: sync the local corpus from upstream → translate new days → back up
-  local `main` to origin (`--force-with-lease`) → dispatch the cloud deploy. The log
-  (`runtime/update-log.txt`) carries explicit `*** WARNING ***` markers if the local sync
+- **Windows scheduled task `DailyInfoUpdate`** (maintainer's machine): triggers at
+  **07:10 / 09:30 / 12:00 / 21:00** Asia/Shanghai, plus runs on wake if a slot was
+  missed. One chain: sync the local corpus from upstream -> translate new days ->
+  back up local `main` to origin (`--force-with-lease`) -> dispatch the cloud deploy.
+  The task also revives the Discord agent if its process died (guarded, no double
+  instances). No proxy is hardcoded in the task — `.env` is authoritative; the log
+  (`runtime/update-log.txt`) carries explicit `*** WARNING ***` markers if the sync
   ever fails to catch up.
 - **GitHub Actions cron** (3 slots daily: 07:00 / 08:30 / 10:00 +08:00) + every push +
-  manual dispatch: merge the newest `iHeadWater/dailyinfo-web` content → translate new
-  briefing days (translation cache in Actions cache; already-cached days cost zero API
-  calls) → validate → test → check → build → deploy to GitHub Pages. GitHub's own cron
-  has proven unreliable on this repo, which is why the local task is the primary
-  trigger and the crons are a bonus.
+  manual dispatch: merge the newest `iHeadWater/dailyinfo-web` content -> translate
+  new briefing days (translation cache in Actions cache; already-cached days cost zero
+  API calls) -> validate -> test -> check -> build -> deploy to GitHub Pages -> post
+  the English digest to the Discord category channels (webhooks, dedup-marked under
+  `runtime/bot-cache/.discord-posted.json`). GitHub's own cron has proven unreliable
+  on this repo, which is why the local task is the primary trigger and the crons are a
+  bonus.
 - Upstream publishes categories in **waves** through the morning (ai_news first, then
   arxiv/code/papers/resource); the repeated slots exist so the deployed site catches
   every wave instead of a single morning snapshot.
