@@ -1007,7 +1007,9 @@ University access (WebVPN) Ã¢â‚¬â€ 3 steps:
 }
 
 async function fetchCommand(corpus, rawArgument) {
-  const argument = rawArgument.replace(/--pick\s+\d+\s*/i, '').replace(/--uni\s*/i, '').trim();
+  // a title clipped by thread-context limits arrives with a trailing ellipsis;
+  // drop it so the relevance match sees the real words
+  const argument = rawArgument.replace(/[…]+\s*$/, '').replace(/\.\.\.\s*$/, '').replace(/--pick\s+\d+\s*/i, '').replace(/--uni\s*/i, '').trim();
   const pickMatch = rawArgument.match(/--pick\s+(\d+)/i);
   const allowUniLink = /--uni/i.test(rawArgument);
   if (!argument) throw new Error('Usage: fetch <query | arxiv-url | doi>   e.g. fetch "attention is all you need"');
@@ -1065,10 +1067,18 @@ async function fetchCommand(corpus, rawArgument) {
       if (index < 0) return;
     } else if (scores[0] >= AUTO_PICK_THRESHOLD) {
       // 100% title match (the user pasted the exact title) - no ranking dance.
-      if (candidates.length > 1 && scores[0] < 1) {
+      // In agent mode the ranking is never shown to the user: a >=55% match
+      // picks silently (the loop resolved the title from thread context).
+      if (!AGENT_MODE && candidates.length > 1 && scores[0] < 1) {
         printCandidates(candidates, scores);
-        console.log(`(auto-picking 1 Ã¢â‚¬â€ ${Math.round(scores[0] * 100)}% title match; rerun with --pick N to choose another)\n`);
+        console.log(`(auto-picking 1 - ${Math.round(scores[0] * 100)}% title match; rerun with --pick N to choose another)\n`);
       }
+    } else if (AGENT_MODE) {
+      // Below the confidence threshold: hand the ranking to the agent loop as
+      // an observation (it may re-pick with --pick N) instead of the chat.
+      printCandidates(candidates, scores);
+      console.log('[agent] no confident title match - the candidates above go to the agent, not the user.\n');
+      return;
     } else {
       printCandidates(candidates, scores);
       console.log('No confident title match Ã¢â‚¬â€ pick one with --pick N, or refine the query.\n');

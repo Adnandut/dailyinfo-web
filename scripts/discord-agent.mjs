@@ -576,10 +576,11 @@ async function runTool(tool, argument, ctx) {
       const fetchedTitle = logText.match(/^Paper: (.+)$/m)?.[1];
       const paperUrl = logText.match(/^Paper page: (\S+)$/m)?.[1] ?? '';
       if (!fetchedTitle) {
-        // No confident match — report back as an observation so the agent can
-        // refine the query or fall back to web_search, instead of dumping the
-        // CLI candidate list into the chat.
-        return `FETCH: no confident match for "${argument}". The candidates did not pass the relevance gate — refine the title or use web_search.`;
+        // No confident match — hand the ranking to the loop as an observation
+        // so it can re-pick with --pick N or fall back to web_search, instead
+        // of dumping the CLI candidate list into the chat.
+        const ranking = logText.split('\n').filter((l) => /^\s+\d+\./.test(l)).slice(0, 5).join('\n');
+        return `FETCH: no confident match for "${argument}". Candidates (pick one by re-running fetch with "--pick N"):\n${ranking}`;
       }
       threadPaper.set(io.contextKey, fetchedTitle);
       writeAgentState({ lastPaperTitle: fetchedTitle, lastPaperUrl: paperUrl });
