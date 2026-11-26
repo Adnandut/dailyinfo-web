@@ -476,6 +476,7 @@ const AGENT_SYSTEM =
   + '• zotero_save needs the Zotero desktop app open on this PC; if the result says it is not running, tell the user to open it and say "zotero" again. '
   + '• Citation saving works for ANY fetched paper — paywalled or not. Metadata (title/authors/DOI) is enough; NEVER suggest manual citation entry or make PDF availability a condition for saving. '
   + '• Ordinal references ("article number 2", "the second paper", "paper #3") resolve against the numbered list in the thread context: identify that item\'s exact TITLE and call fetch_paper with it. Never echo a digest part back and never search for strings like "part 18". '
+  + '• Paywalled paper + the user wants the full text → offer the university flow: "open the paper via webvpn.dlut.edu.cn, copy the PDF or article URL from the address bar, then say uni <that link>". If they paste such a link, call uni_fetch with it (and append " | <the paywalled paper page URL>" when known) — access is checked with their own session cookie, the PDF is downloaded + summarized, and the link pattern is learned per journal for next time. The uni output is already user-facing; do not repeat it. '
   + '• Small talk or anything needing no tool → reply with {"answer": "..."} immediately. '
   + '• Recurring multi-step workflows have SKILLS — if one matches the request, call use_skill and then follow its instructions step by step with the other tools. '
   + '• Tool output already delivered to the user must NOT be repeated in the final answer — synthesize, add next steps, or keep the answer to one line.';
@@ -494,6 +495,7 @@ const TOOL_SPEC = [
   '{"tool":"read_weekly_draft","argument":"<optional date, empty = latest>"}',
   '{"tool":"long_write","argument":"<filename (in runtime/briefings/weekly/) to write the generated article to>"}',
   '{"tool":"post_article","argument":"<channel name, default ai-news>"}',
+  '{"tool":"uni_fetch","argument":"<webvpn-url [| publisher-url]>"}',
   '{"answer":"<final reply to the user>"}',
 ].join('\n');
 
@@ -589,7 +591,7 @@ async function runTool(tool, argument, ctx) {
       // ALREADY produced the full-text summary; when paywalled, there is no
       // PDF to summarize. Chaining only burned tokens twice (user-reported).
       await io.send(cleanLogForReply(job.log) || job.result || '(no output)');
-      await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).');
+      await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).' + (logText.includes('No open-access PDF') ? '\n🔗 full text: open the paper via **webvpn.dlut.edu.cn**, copy the PDF/article URL, then say `uni <link>` — I will download it with your session and summarize it.' : ''));
       return `Fetched "${fetchedTitle}". The full summary is ALREADY delivered above — do NOT call summarize_pdf for it again.`;
     }
     case 'summarize_pdf': {
@@ -695,6 +697,25 @@ async function runTool(tool, argument, ctx) {
         await channel.send({ content: `【Part ${i + 1}/${parts.length}】\n${clip(parts[i], MAX_MESSAGE_CHARS - 20)}` });
       }
       return `Posted ${parts.length} part(s) of ${file} to #${channelName}.`;
+    }
+    case 'uni_fetch': {
+      const job = runner.submit(`uni ${argument ?? ''}`.trim());
+      await job.done;
+      const out = cleanLogForReply(job.log) || job.result || '(no output)';
+      await io.send(out);
+      if (/PDF saved/i.test(out)) {
+        // University access granted — the PDF is in runtime/papers; summarize it.
+        const slugMatch = out.match(/PDF saved: (.*\.pdf)/);
+        if (slugMatch) {
+          const slug = slugMatch[1].split(/[\\/]/).pop().replace(/\.pdf$/, '');
+          await io.send('⏳ summarizing the paper from your university copy…');
+          const sumJob = runner.submit(`summarize ${slug}`);
+          await sumJob.done;
+          const sumOut = cleanLogForReply(sumJob.log) || sumJob.result || '';
+          if (sumJob.status === 'done' && sumOut) await io.send(sumOut);
+        }
+      }
+      return 'University access result delivered to the user.';
     }
     default:
       return `UNKNOWN TOOL "${tool}" — pick one from the list.`;

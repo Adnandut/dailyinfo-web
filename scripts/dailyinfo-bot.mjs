@@ -1230,6 +1230,158 @@ async function weeklyCommand() {
   console.log('(next: ask the agent to polish it — "polish weekly recap")');
 }
 
+
+// ---------------------------------------------------------------------------
+// University (WebVPN) access — cookie-based, local-only, user's own session.
+// The user pastes their WebVPN session cookie into .env (UNI_COOKIE) and gives
+// the agent a WebVPN link; the PDF is downloaded, summarized, and the link
+// pattern is learned per publisher domain so future papers need no paste.
+// ---------------------------------------------------------------------------
+
+const uniLinksPath = join(repo, 'runtime', 'uni-links.json');
+
+/** .env is the user's credential store; re-read UNI_COOKIE per call so a
+ * fresh cookie does not require a front-end restart. */
+function readUniCookie() {
+  if (process.env.UNI_COOKIE) return process.env.UNI_COOKIE.trim();
+  try {
+    const line = readFileSync(join(repo, '.env'), 'utf8').split(/\r?\n/).find((l) => l.startsWith('UNI_COOKIE='));
+    return line ? line.slice('UNI_COOKIE='.length).trim() : '';
+  } catch {
+    return '';
+  }
+}
+
+function loadUniLinks() {
+  try { return JSON.parse(readFileSync(uniLinksPath, 'utf8')); } catch { return {}; }
+}
+
+function saveUniLinks(links) {
+  mkdirSync(dirname(uniLinksPath), { recursive: true });
+  writeFileSync(uniLinksPath, JSON.stringify(links, null, 2) + '\n', 'utf8');
+}
+
+function isPdfResponse(response, buffer) {
+  const type = (response.headers.get('content-type') ?? '').toLowerCase();
+  return type.includes('pdf') || buffer.subarray(0, 5).toString('latin1').startsWith('%PDF-');
+}
+
+/** Fetch a URL with the user's university session cookie. Direct connection
+ * (no proxy): the WebVPN host is in China and proxying it adds a failure. */
+async function uniFetch(url) {
+  const cookie = readUniCookie();
+  if (!cookie) return { error: 'NO_COOKIE' };
+  return fetch(url, {
+    headers: { 'User-Agent': BROWSER_UA, Cookie: cookie, Accept: 'text/html,application/pdf,*/*' },
+    redirect: 'follow',
+    signal: AbortSignal.timeout(120_000),
+  });
+}
+
+async function saveUniPdf(response, paperTitle) {
+  const buffer = Buffer.from(await response.arrayBuffer());
+  if (!isPdfResponse(response, buffer)) return null;
+  const outDir = join(repo, 'runtime', 'papers');
+  mkdirSync(outDir, { recursive: true });
+  const outPath = join(outDir, slugifyFile(paperTitle || 'uni-paper') + '.pdf');
+  writeFileSync(outPath, buffer);
+  return outPath;
+}
+
+async function uniCommand(corpus, argument = '') {
+  const target = String(argument ?? '').trim();
+  const [urlPart, publisherPart] = target.split('|').map((x) => x.trim()).filter(Boolean);
+  if (!urlPart) {
+    const links = loadUniLinks();
+    console.log('Usage: uni <webvpn-or-publisher-url> [| publisher-url]');
+    console.log('Cookie: ' + (readUniCookie() ? 'set' : 'NOT set (paste your WebVPN Cookie header into .env UNI_COOKIE=)'));
+    console.log('Learned publisher domains: ' + (Object.keys(links).join(', ') || '(none)'));
+    return;
+  }
+
+  const uniHost = (() => { try { return new URL(process.env.UNI_EZPROXY_URL ?? '').host; } catch { return ''; } })();
+  const isWebvpnUrl = (() => { try { return new URL(urlPart).host === uniHost; } catch { return false; } })();
+
+  // Case 1: a publisher/DOI link - try a learned WebVPN template for its domain.
+  if (!isWebvpnUrl) {
+    let publisherUrl = urlPart;
+    try {
+      const probe = await fetch(publisherUrl, { redirect: 'follow', signal: AbortSignal.timeout(60_000), headers: { 'User-Agent': BROWSER_UA } });
+      publisherUrl = probe.url || publisherUrl;
+    } catch { /* keep the original */ }
+    const host = (() => { try { return new URL(publisherUrl).host; } catch { return ''; } })();
+    const link = loadUniLinks()[host];
+    if (!link?.prefix) {
+      console.log('No learned WebVPN link for ' + (host || 'this domain') + ' yet.');
+      console.log('One-time setup: open the paper through ' + (uniHost || 'your WebVPN') + ' in your browser, copy the PDF or article URL from the address bar, then say:');
+      console.log('  uni <that webvpn url> | ' + publisherUrl);
+      return;
+    }
+    const publisherPath = (() => { try { return new URL(publisherUrl).pathname + (new URL(publisherUrl).search ?? ''); } catch { return ''; } })();
+    const webvpnUrl = link.prefix + publisherPath;
+    console.log('[agent] trying your university access for ' + host + ' …');
+    return uniCommand(corpus, webvpnUrl + ' | ' + publisherUrl);
+  }
+
+  // Case 2: a WebVPN link - fetch with the session cookie and check access.
+  if (!readUniCookie()) {
+    console.log('Your WebVPN cookie is not set yet (one-time setup):');
+    console.log('  1. Log into ' + (uniHost || 'your WebVPN portal') + ' in your browser');
+    console.log('  2. F12 -> Network -> click any request -> copy the whole Cookie header value');
+    console.log('  3. Paste it into .env as UNI_COOKIE=<value>');
+    return;
+  }
+  process.stdout.write('[agent] fetching through your university session…\n');
+  let response;
+  try {
+    response = await uniFetch(urlPart);
+  } catch (error) {
+    console.log('University fetch failed: ' + error.message);
+    return;
+  }
+  if (!response.ok) {
+    console.log('No access (HTTP ' + response.status + ') — your WebVPN session may have expired: re-login in the browser and refresh UNI_COOKIE in .env.');
+    return;
+  }
+  const slugBase = getLastFetchedPaper()?.title || readAgentTitle();
+  const outPath = await saveUniPdf(response, slugBase);
+  if (!outPath) {
+    const text = (await response.text()).slice(0, 400);
+    console.log('The university session responded, but not with a PDF (likely an article page or a login redirect). First bytes:');
+    console.log(text.replace(/\s+/g, ' '));
+    return;
+  }
+  console.log('Access confirmed - PDF saved: ' + outPath);
+  if (publisherPart) learnUniLink(publisherPart, urlPart);
+  const text = await extractPdfText(outPath);
+  if (text.length < 500) { console.log('(PDF has no extractable text - likely a scan.)'); return; }
+  console.log('[agent] ' + text.length.toLocaleString() + ' chars extracted - summarizing…\n');
+  console.log(await summarizeText(text));
+}
+
+/** Learn publisherHost -> WebVPN prefix, so the next paper from the same
+ * journal is fetched without asking the user for a link again. */
+function learnUniLink(publisherUrl, webvpnUrl) {
+  try {
+    const pub = new URL(publisherUrl);
+    const web = new URL(webvpnUrl);
+    if (!web.pathname.endsWith(pub.pathname)) return; // structure changed - skip
+    const prefix = web.origin + web.pathname.slice(0, web.pathname.length - pub.pathname.length);
+    const links = loadUniLinks();
+    links[pub.host] = { prefix, sample: webvpnUrl, added: new Date().toISOString().slice(0, 10) };
+    saveUniLinks(links);
+    console.log('[agent] learned: future ' + pub.host + ' papers will try your university access automatically.');
+  } catch { /* learning is best-effort */ }
+}
+
+/** The paper title from the agent state (last fetched), or empty. */
+function readAgentTitle() {
+  try {
+    const state = JSON.parse(readFileSync(join(repo, 'runtime', 'agent-state.json'), 'utf8'));
+    return String(state.lastPaperTitle ?? '');
+  } catch { return ''; }
+}
+
 // ---------------------------------------------------------------------------
 // CLI / REPL
 // ---------------------------------------------------------------------------
@@ -1368,6 +1520,9 @@ async function runCommand(corpus, input) {
         case 'weekly':
         await weeklyCommand();
         return true;
+        case 'uni':
+          await uniCommand(corpus, argument);
+          return true;
     case 'exit':
     case 'quit':
       return false;
@@ -1439,4 +1594,5 @@ export {
   slugifyFile,
   chat,
   extractPdfText,
+  uniCommand,
 };
