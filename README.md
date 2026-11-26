@@ -230,6 +230,24 @@ in spawned processes. Notes learned the hard way:
   subscription profile) serves as a fallback proxy (port 17890) when the FlClash UI
   proxy is off; its auto-start wrapper is in the Startup folder.
 
+### University access (your own session, local-only)
+
+Paywalled papers can be fetched through your own university session — everything
+runs locally, so this is your own credential, used only for your own reading:
+
+1. One-time: log into `webvpn.dlut.edu.cn` in your browser, then F12 → Network →
+   any request → copy the whole `Cookie:` header value into `.env` as
+   `UNI_COOKIE=...` (refresh it when the session expires).
+2. Open the paywalled paper through the WebVPN portal and copy the PDF/article URL
+   from the address bar.
+3. Tell the Discord agent: `uni <that link>` — it downloads the PDF with your
+   session, confirms access, saves it to `runtime/papers/`, summarizes it, and
+   **learns the WebVPN link pattern for that journal**, so the next paper from the
+   same journal is fetched automatically (no paste needed).
+
+Citation saving (`zotero`/`ris`) works for paywalled papers too — metadata alone is
+enough; no PDF required.
+
 ### Scheduled deployment (this fork — zero-touch)
 
 - **Windows scheduled task `DailyInfoUpdate`** (maintainer's machine): triggers at
