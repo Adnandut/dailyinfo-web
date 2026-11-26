@@ -9,11 +9,11 @@ source:
   external_id: "nari-labs/Qwen3.8-27B-NariQ-GGUF"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:11.100726+08:00"
+retrieved_at: "2026-11-27T03:45:13.131511+08:00"
 published_at: "2026-11-26T03:45:39.243523+08:00"
-summary: "NariQ-GGUF 将 Qwen3.8-27B 量化为 GGUF 图文多模态版本，便于本地/边缘环境高效部署与推理。"
+summary: "nari-labs 将 Qwen3.8-27B 量化为 GGUF 的图文理解模型，兼顾 27B 能力与本地推理效率。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-26"]
+briefing_ids: ["code-2026-11-26", "code-2026-11-27"]
 ---

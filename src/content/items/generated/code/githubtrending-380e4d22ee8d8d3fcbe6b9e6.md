@@ -9,11 +9,11 @@ source:
   external_id: "mjmirza/app-store-compliance"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:01.734712+08:00"
+retrieved_at: "2026-11-27T03:45:03.818494+08:00"
 published_at: "2026-11-20T03:45:36.560503+08:00"
-summary: "应用商店合规预检工具，内置 124 种拒审模式与修复、隐私清单检查及 114 项法规截止日期，并支持 AI 编码代理。"
+summary: "应用商店合规开放手册与提交前守卫，覆盖 125 种拒审模式、隐私清单与数据安全检查及 117 个法规截止日期。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
 ---

@@ -9,11 +9,11 @@ source:
   external_id: "apple/DepthPro2"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:11.100726+08:00"
+retrieved_at: "2026-11-27T03:45:13.131511+08:00"
 published_at: "2026-11-24T03:45:39.854026+08:00"
-summary: "DepthPro2 是苹果推出的图像深度估计模型，聚焦高精度深度图生成与空间感知能力。"
+summary: "Apple 的 DepthPro2 聚焦图像深度估计，以高社区关注度体现其在精细深度感知上的技术价值。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
 ---

@@ -9,11 +9,11 @@ source:
   external_id: "inclusionAI/LingSante-3.1-flash"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:11.100726+08:00"
+retrieved_at: "2026-11-27T03:45:13.131511+08:00"
 published_at: "2026-11-25T03:45:39.749945+08:00"
-summary: "LingSante-3.1-flash 是 LingSante 系列的快速文本生成模型，强调低延迟推理与高并发场景下的性价比。"
+summary: "inclusionAI 的 LingSante-3.1-flash 主打快速文本生成，以 flash 版本强调低延迟推理。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
 ---

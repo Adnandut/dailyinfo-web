@@ -9,11 +9,11 @@ source:
   external_id: "rdata92/LTX-2.3-10Eros"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:29.533701+08:00"
+retrieved_at: "2026-11-27T03:45:32.497834+08:00"
 published_at: "2026-11-17T03:45:34.758541+08:00"
-summary: "基于LTX-2.3的视频生成Gradio演示，支持风格化视频创作与快速效果预览。"
+summary: "基于 LTX-2.3 的视频生成 Gradio 前端，支持快速进行文本/图像条件视频生成实验。"
 why_it_matters: null
-tags: []
+tags: ["Gradio", "LTX-2.3", "video-generation"]
 language: "zh-CN"
-briefing_ids: ["code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
 ---

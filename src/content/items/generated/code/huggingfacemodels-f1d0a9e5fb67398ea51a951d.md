@@ -9,11 +9,11 @@ source:
   external_id: "thinkingmachines/Inkling-2-Mini"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:11.100726+08:00"
+retrieved_at: "2026-11-27T03:45:13.131511+08:00"
 published_at: "2026-11-24T03:45:39.854026+08:00"
-summary: "Inkling-2-Mini 是面向图文理解与跨模态问答的轻量多模态模型，兼顾部署效率与图像语义推理能力。"
+summary: "Thinking Machines 的 Inkling-2-Mini 轻量图文理解模型，以 Mini 规模实现高效多模态推理。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
 ---

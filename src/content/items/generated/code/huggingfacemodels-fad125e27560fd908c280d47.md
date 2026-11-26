@@ -9,11 +9,11 @@ source:
   external_id: "SulphurAI/Sulphur-3"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:11.100726+08:00"
+retrieved_at: "2026-11-27T03:45:13.131511+08:00"
 published_at: "2026-11-24T03:45:39.854026+08:00"
-summary: "Sulphur-3 是一款高关注度开源模型，主打通用生成/推理能力与社区生态适配，适合作为可定制的基座模型。"
+summary: "SulphurAI 的 Sulphur-3 通用模型，凭借较高社区热度和下载量体现其通用生成能力与易用性。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
 ---

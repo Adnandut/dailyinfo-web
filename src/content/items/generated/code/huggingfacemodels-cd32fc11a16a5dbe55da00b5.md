@@ -9,11 +9,11 @@ source:
   external_id: "prism-ml/Ternary-Bonsai-2.5-27B-GGUF"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:11.100726+08:00"
+retrieved_at: "2026-11-27T03:45:13.131511+08:00"
 published_at: "2026-11-26T03:45:39.243523+08:00"
-summary: "Ternary-Bonsai-2.5-27B-GGUF 是采用三值量化的大语言模型 GGUF 版本，在 27B 规模下大幅压缩体积并降低推理成本。"
+summary: "prism-ml 的 Ternary-Bonsai-2.5-27B-GGUF 采用三值量化，将 27B 文本生成模型压缩到更适合本地高效推理的形态。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-26"]
+briefing_ids: ["code-2026-11-26", "code-2026-11-27"]
 ---
