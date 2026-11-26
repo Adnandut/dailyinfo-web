@@ -24,7 +24,7 @@
 import { Client, GatewayIntentBits, Events } from 'discord.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import https from 'node:https';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createJobRunner } from './agent-jobs.mjs';
@@ -591,10 +591,28 @@ async function runTool(tool, argument, ctx) {
       // ALREADY produced the full-text summary; when paywalled, there is no
       // PDF to summarize. Chaining only burned tokens twice (user-reported).
       await io.send(cleanLogForReply(job.log) || job.result || '(no output)');
-      await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).' + (logText.includes('No open-access PDF') ? '\n🔗 full text: open the paper via **webvpn.dlut.edu.cn**, copy the PDF/article URL, then say `uni <link>` — I will download it with your session and summarize it.' : ''));
+      if (logText.includes('No open-access PDF')) {
+        // Paywalled: hand the user the clickable link (Edge has the university
+        // login saved), watch Downloads, summarize the PDF when it lands.
+        const slug = bot.slugifyFile(fetchedTitle);
+        if (paperUrl) watchForDownloadedPdf(Date.now(), slug, io);
+        await io.send(paperUrl
+          ? `🔗 [Open the paper](${paperUrl}) — log in with your university account (Edge has it saved) and download the PDF.`
+          : '🔗 Open the paper through your university access and download the PDF.');
+        await io.send("👀 I'm watching your Downloads folder for 5 minutes — when the PDF arrives I'll summarize it automatically. (Citation anytime: say **zotero** or **ris**.)");
+      } else {
+        await io.send('💾 save it: say **zotero** (desktop app must be open) or **ris** (Mendeley file).');
+      }
       return `Fetched "${fetchedTitle}". The full summary is ALREADY delivered above — do NOT call summarize_pdf for it again.`;
     }
     case 'summarize_pdf': {
+      // If the runtime copy is missing, adopt the newest PDF from Downloads
+      // (the manual-download flow may have landed it there after the watch
+      // window closed).
+      if (argument && !existsSync(join(repo, 'runtime', 'papers', `${argument}.pdf`))) {
+        const adopted = adoptDownloadedPdf(Date.now() - 30 * 60_000, String(argument));
+        if (adopted) await io.send(`📥 adopted PDF from Downloads → ${adopted}`);
+      }
       const job = runner.submit(`summarize ${argument}`.trim());
       await job.done;
       const out = cleanLogForReply(job.log) || job.result || '(no output)';
@@ -730,6 +748,74 @@ function cleanLogForReply(log) {
     .join('\n')
     .trim();
 }
+
+// ---------------------------------------------------------------------------
+// Downloads watching — the paywalled-paper flow: the agent posts the link, the
+// user clicks it, logs in (Edge has the university credentials saved), and
+// downloads the PDF. The agent watches the Downloads folder and summarizes the
+// paper automatically the moment the file lands.
+// ---------------------------------------------------------------------------
+
+const downloadsDir = join(process.env.USERPROFILE ?? '', 'Downloads');
+const downloadWatchers = []; // { sinceTs, slug, io, deadline }
+
+function newestDownloadedPdf(sinceTs) {
+  try {
+    let best = null;
+    for (const f of readdirSync(downloadsDir)) {
+      if (!f.toLowerCase().endsWith('.pdf')) continue;
+      const full = join(downloadsDir, f);
+      const stat = statSync(full);
+      if (stat.mtimeMs < sinceTs) continue;
+      if (!best || stat.mtimeMs > best.stat.mtimeMs) best = { full, stat };
+    }
+    return best?.full ?? '';
+  } catch {
+    return '';
+  }
+}
+
+/** Copy the newest post-`sinceTs` PDF from Downloads into runtime/papers/. */
+function adoptDownloadedPdf(sinceTs, slug) {
+  const src = newestDownloadedPdf(sinceTs);
+  if (!src) return '';
+  const outDir = join(repo, 'runtime', 'papers');
+  mkdirSync(outDir, { recursive: true });
+  const outPath = join(outDir, `${slug}.pdf`);
+  copyFileSync(src, outPath);
+  return outPath;
+}
+
+function watchForDownloadedPdf(sinceTs, slug, io) {
+  downloadWatchers.push({ sinceTs, slug, io, deadline: Date.now() + 5 * 60_000 });
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (let i = downloadWatchers.length - 1; i >= 0; i--) {
+    const watcher = downloadWatchers[i];
+    if (now > watcher.deadline) {
+      downloadWatchers.splice(i, 1);
+      void watcher.io.send('⌛ no PDF showed up in Downloads — if you saved it elsewhere, say `summarize <path>`; otherwise fetch again when ready.');
+      continue;
+    }
+    if (!newestDownloadedPdf(watcher.sinceTs)) continue;
+    downloadWatchers.splice(i, 1);
+    void (async () => {
+      try {
+        const outPath = adoptDownloadedPdf(watcher.sinceTs, watcher.slug);
+        await watcher.io.send(`📥 PDF captured from Downloads → runtime/papers/${watcher.slug}.pdf — summarizing…`);
+        const job = runner.submit(`summarize ${watcher.slug}`);
+        await job.done;
+        const out = cleanLogForReply(job.log) || job.result || '';
+        if (job.status === 'done' && out) await watcher.io.send(out);
+        else await watcher.io.send(`⚠️ summary failed: ${job.result}`);
+      } catch (error) {
+        await watcher.io.send(`⚠️ auto-summarize failed: ${error.message}`);
+      }
+    })();
+  }
+}, 5000);
 
 export async function agentHandle(text, io) {
   const bot = await import(`./dailyinfo-bot.mjs?ts=${Date.now()}`);
