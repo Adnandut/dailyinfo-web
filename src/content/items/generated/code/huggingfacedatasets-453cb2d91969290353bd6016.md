@@ -15,5 +15,5 @@ summary: "面向网络安全学习与实践的综合性资源库，覆盖安全�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
 ---

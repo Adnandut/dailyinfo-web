@@ -15,5 +15,5 @@ summary: "轻量文本生成模型，主打快速推理与高效通用文本创�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24"]
+briefing_ids: ["code-2026-11-24"]
 ---

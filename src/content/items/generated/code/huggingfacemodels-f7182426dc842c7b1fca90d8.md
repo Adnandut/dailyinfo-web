@@ -15,5 +15,5 @@ summary: "27B 多模态图文模型，主打高质量图文理解与开源部署
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25"]
 ---

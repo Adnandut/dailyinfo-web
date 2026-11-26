@@ -14,5 +14,5 @@ summary: "请相关教学单位和教师按通知要求报送“双千”计划�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["resource-2026-11-20", "resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23", "resource-2026-11-24", "resource-2026-11-25", "resource-2026-11-26"]
+briefing_ids: ["resource-2026-11-21", "resource-2026-11-22", "resource-2026-11-23", "resource-2026-11-24", "resource-2026-11-25", "resource-2026-11-26"]
 ---

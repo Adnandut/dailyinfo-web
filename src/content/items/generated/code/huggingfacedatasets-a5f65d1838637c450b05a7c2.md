@@ -15,5 +15,5 @@ summary: "提供符合SimReady规范的3D资产库，可直接用于物理准确
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
 ---

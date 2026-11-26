@@ -15,5 +15,5 @@ summary: "静态 Slack 表情包生成工具，可快速制作并导出自定义
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25"]
 ---

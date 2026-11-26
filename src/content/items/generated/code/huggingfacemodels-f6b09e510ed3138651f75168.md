@@ -15,5 +15,5 @@ summary: "Qwen3.8-27B-pi-adapted 是在 Qwen3.8-27B 基础上适配 pi 框架/�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
 ---

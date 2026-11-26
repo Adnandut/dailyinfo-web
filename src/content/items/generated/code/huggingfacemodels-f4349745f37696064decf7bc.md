@@ -15,5 +15,5 @@ summary: "商汤 SenseNova Loop-9B 多模态模型，以循环架构提升图文
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25"]
 ---

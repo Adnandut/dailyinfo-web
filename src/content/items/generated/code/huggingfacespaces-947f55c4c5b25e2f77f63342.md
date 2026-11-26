@@ -15,5 +15,5 @@ summary: "Krea2T增强版Gradio应用，优化文生图创作流程与参数调�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
 ---

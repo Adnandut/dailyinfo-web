@@ -15,5 +15,5 @@ summary: "Hy4-flash 是腾讯的轻量快速图文多模态模型，主打低延
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26"]
 ---

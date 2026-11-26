@@ -15,5 +15,5 @@ summary: "面向视觉语言模型的证据理解与多模态推理数据集，�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-20", "code-2026-11-24"]
+briefing_ids: ["code-2026-11-24"]
 ---
