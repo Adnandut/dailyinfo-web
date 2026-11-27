@@ -475,7 +475,7 @@ const AGENT_SYSTEM =
   + '• Multi-step requests ("find X and save it to Zotero") → plan the minimal tool sequence yourself. '
   + '• zotero_save needs the Zotero desktop app open on this PC; if the result says it is not running, tell the user to open it and say "zotero" again. '
   + '• Citation saving works for ANY fetched paper — paywalled or not. Metadata (title/authors/DOI) is enough; NEVER suggest manual citation entry or make PDF availability a condition for saving. '
-  + '• Ordinal references ("article number 2", "the second paper", "paper #3") resolve against the numbered list in the thread context: identify that item\'s exact TITLE and call fetch_paper with it. Never echo a digest part back and never search for strings like "part 18". '
+  + '• Ordinal references ("article number 30", "the second paper", "paper #3") resolve against the DAY\'S DIGEST via the digest_item tool (global numbering across sections; infer the category from the thread context — arxiv digest parts are the big numbered lists). Then fetch_paper the returned title. If the number is out of range, say so and give the digest size. Never echo a digest part back, never search for part labels, and never fetch a paper that was not clearly identified. '
   + '• Paywalled paper + the user wants the full text → offer the university flow: "open the paper via webvpn.dlut.edu.cn, copy the PDF or article URL from the address bar, then say uni <that link>". If they paste such a link, call uni_fetch with it (and append " | <the paywalled paper page URL>" when known) — access is checked with their own session cookie, the PDF is downloaded + summarized, and the link pattern is learned per journal for next time. The uni output is already user-facing; do not repeat it. '
   + '• Small talk or anything needing no tool → reply with {"answer": "..."} immediately. '
   + '• Recurring multi-step workflows have SKILLS — if one matches the request, call use_skill and then follow its instructions step by step with the other tools. '
@@ -496,6 +496,7 @@ const TOOL_SPEC = [
   '{"tool":"long_write","argument":"<filename (in runtime/briefings/weekly/) to write the generated article to>"}',
   '{"tool":"post_article","argument":"<channel name, default ai-news>"}',
   '{"tool":"uni_fetch","argument":"<webvpn-url [| publisher-url]>"}',
+  '{"tool":"digest_item","argument":"[category] <number> — e.g. \\"arxiv 30\\" or \\"papers 7\\""}',
   '{"answer":"<final reply to the user>"}',
 ].join('\n');
 
@@ -735,6 +736,20 @@ async function runTool(tool, argument, ctx) {
       }
       return 'University access result delivered to the user.';
     }
+    case 'digest_item': {
+      // "explain article number N" — resolve N against the day's digest
+      // (global numbering across sections), then the loop fetches the title.
+      const tokens = String(argument ?? '').trim().split(/\s+/).filter(Boolean);
+      const category = tokens.find((t) => /^(papers|arxiv|ai_news|ai-news|code|resource)$/i.test(t))?.replace('-', '_') ?? 'arxiv';
+      const number = Number(tokens.reverse().find((t) => /^\d+$/.test(t)));
+      if (!number) return 'DIGEST_ITEM: no item number given. Usage: digest_item "[category] <number>".';
+      const { date, items } = bot.digestItems(category);
+      const item = items.find((it) => it.no === number);
+      if (!item) {
+        return `DIGEST_ITEM: the ${category} digest for ${date || 'the latest day'} has ${items.length} items — number ${number} does not exist. Nearest: #${items.length}.`;
+      }
+      return `DIGEST ITEM #${item.no} of the ${category} digest (${date}, section: ${item.section}):\nTITLE: ${item.title}\n\nNow call fetch_paper with exactly this title to explain it.`;
+    }
     default:
       return `UNKNOWN TOOL "${tool}" — pick one from the list.`;
   }
@@ -826,7 +841,7 @@ export async function agentHandle(text, io) {
   const state = readAgentState();
 
   const contextBlock =
-    `Last fetched paper: ${io.contextTitle || state.lastPaperTitle || '(none)'}`
+    `Last fetched paper in THIS thread: ${threadPaper.get(io.contextKey) || '(none)'}`
     + (state.lastPaperUrl ? `\nIts link: ${state.lastPaperUrl}` : '')
     + (history ? `\n\nThread context:\n${clip(history, 1400)}` : '')
     + `\n\nUser message: ${text}`;

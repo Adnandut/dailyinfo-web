@@ -1382,6 +1382,43 @@ function readAgentTitle() {
   } catch { return ''; }
 }
 
+
+/** The day's category digest as a globally-numbered item list. Users say
+ * "article 30" meaning the 30th article of the whole digest, counted across
+ * the per-journal / per-section headings (which number items 1..N each).
+ * Works for papers (per-journal "Daily Briefing") and arxiv ("Daily Digest"). */
+function digestItems(category = 'arxiv', date = '') {
+  const catDir = join(cacheDir, date);
+  if (!existsSync(catDir)) {
+    const available = (existsSync(cacheDir) ? readdirSync(cacheDir) : [])
+      .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && existsSync(join(cacheDir, d, category + '.md')))
+      .sort();
+    date = available[available.length - 1] ?? '';
+    if (!date) return { date: '', items: [] };
+  }
+  const body = readFileSync(join(cacheDir, date, category + '.md'), 'utf8').replace(/^---[\s\S]*?---\n?/, '');
+  const items = [];
+  let section = '';
+  let running = 0;
+  for (const line of body.split(/\r?\n/)) {
+    const heading = line.match(/^#{1,3}\s+(.+?)\s*$/);
+    if (heading) {
+      section = heading[1]
+        .replace(/\s*\(\d{4}-\d{2}-\d{2}\).*$/, '')
+        .replace(/\s*-\s*\d+\s+(Articles?|papers?)\s*$/i, '')
+        .replace(/\s*Daily (Briefing|Digest)\s*$/i, '')
+        .trim();
+      continue;
+    }
+    const item = line.match(/^(\d+)\.\s+\*\*(.+?)\*\*\s*$/);
+    if (item) {
+      running += 1;
+      items.push({ no: running, sectionNo: Number(item[1]), title: item[2].trim(), section });
+    }
+  }
+  return { date, items };
+}
+
 // ---------------------------------------------------------------------------
 // CLI / REPL
 // ---------------------------------------------------------------------------
@@ -1595,4 +1632,5 @@ export {
   chat,
   extractPdfText,
   uniCommand,
+  digestItems,
 };
