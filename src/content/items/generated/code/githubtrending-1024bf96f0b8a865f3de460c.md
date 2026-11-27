@@ -15,5 +15,5 @@ summary: "开源本地优先 AI 视频剪辑桌面工具与 MCP Server，一键�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
+briefing_ids: ["code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
 ---

@@ -15,5 +15,5 @@ summary: "面向智能体的知识基础设施，通过单一 API 搜索、抓�
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-21", "code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
+briefing_ids: ["code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
 ---
