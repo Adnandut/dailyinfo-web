@@ -1388,14 +1388,15 @@ function readAgentTitle() {
  * the per-journal / per-section headings (which number items 1..N each).
  * Works for papers (per-journal "Daily Briefing") and arxiv ("Daily Digest"). */
 function digestItems(category = 'arxiv', date = '') {
-  const catDir = join(cacheDir, date);
-  if (!existsSync(catDir)) {
+  if (!date) {
     const available = (existsSync(cacheDir) ? readdirSync(cacheDir) : [])
       .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && existsSync(join(cacheDir, d, category + '.md')))
       .sort();
     date = available[available.length - 1] ?? '';
-    if (!date) return { date: '', items: [] };
   }
+  if (!date) return { date: '', items: [] };
+  const catDir = join(cacheDir, date);
+  if (!existsSync(catDir)) return { date, items: [] };
   const body = readFileSync(join(cacheDir, date, category + '.md'), 'utf8').replace(/^---[\s\S]*?---\n?/, '');
   const items = [];
   let section = '';
