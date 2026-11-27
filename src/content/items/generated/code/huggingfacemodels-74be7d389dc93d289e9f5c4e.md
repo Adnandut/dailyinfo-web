@@ -9,11 +9,11 @@ source:
   external_id: "strata-engine/Inkling-2-Mini-Strata"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-27T03:45:13.131511+08:00"
+retrieved_at: "2026-11-28T03:45:54.201639+08:00"
 published_at: "2026-11-27T03:45:44.101113+08:00"
-summary: "Inkling-2-Mini 的 Strata 变体聚焦图文理解与结构化多模态处理，以轻量架构降低部署成本。"
+summary: "strata-engine 的 Inkling-2-Mini-Strata 基于 Inkling-2-Mini 做场景化优化，面向图像文本理解与下游多模态任务。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-27"]
+briefing_ids: ["code-2026-11-27", "code-2026-11-28"]
 ---

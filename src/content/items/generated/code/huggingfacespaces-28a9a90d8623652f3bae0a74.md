@@ -9,11 +9,11 @@ source:
   external_id: "xyzanonimous5/Qwen-Image-2.1-Studio"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-27T03:45:32.497834+08:00"
+retrieved_at: "2026-11-28T03:46:18.012759+08:00"
 published_at: "2026-11-27T03:45:44.101113+08:00"
-summary: "基于 Qwen-Image 2.1 的一站式图像创作工作室，集成文生图与图像编辑的 Gradio 界面。"
+summary: "Qwen-Image 2.1的Gradio工作室界面，提供图像生成、编辑与参数调优的一站式体验。"
 why_it_matters: null
-tags: ["Gradio", "Qwen-Image", "text-to-image"]
+tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-27"]
+briefing_ids: ["code-2026-11-27", "code-2026-11-28"]
 ---

@@ -9,11 +9,11 @@ source:
   external_id: "jingyaogong/minimind"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-27T03:45:03.818494+08:00"
+retrieved_at: "2026-11-28T03:45:46.291192+08:00"
 published_at: "2026-11-18T03:45:52.649993+08:00"
-summary: "两小时从零训练 64M 大模型的开源实践项目，降低大模型训练与教学门槛。"
+summary: "minimind 提供从零训练 64M 小语言模型的完整开源方案，主打两小时内完成训练，降低大模型入门与实验门槛。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
+briefing_ids: ["code-2026-11-22", "code-2026-11-23", "code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27", "code-2026-11-28"]
 ---

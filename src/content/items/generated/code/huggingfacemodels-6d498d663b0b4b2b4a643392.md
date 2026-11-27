@@ -9,11 +9,11 @@ source:
   external_id: "Lightricks/LTX-2.5"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-27T03:45:13.131511+08:00"
+retrieved_at: "2026-11-28T03:45:54.201639+08:00"
 published_at: "2026-10-01T08:19:18.900600+08:00"
-summary: "Lightricks 的 LTX-2.5 图像到视频模型，以高点赞和高下载量体现其在高质量视频生成上的领先热度。"
+summary: "Lightricks 的 LTX-2.5 面向高质量图生视频，强调从静态图像生成连贯、可控的视频内容。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27"]
+briefing_ids: ["code-2026-11-24", "code-2026-11-25", "code-2026-11-26", "code-2026-11-27", "code-2026-11-28"]
 ---

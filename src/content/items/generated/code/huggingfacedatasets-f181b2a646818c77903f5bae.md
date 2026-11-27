@@ -9,11 +9,11 @@ source:
   external_id: "inclusionAI/LingSante-MedGuard"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-26T03:45:23.125963+08:00"
+retrieved_at: "2026-11-28T03:46:10.274314+08:00"
 published_at: "2026-11-26T03:45:39.243523+08:00"
-summary: "医疗安全守护模型与工具，聚焦医疗场景中的风险识别与安全合规防护。"
+summary: "面向医疗场景的安全防护模型资源，用于识别与拦截医疗AI应用中的高风险或不合规内容。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-26"]
+briefing_ids: ["code-2026-11-26", "code-2026-11-28"]
 ---

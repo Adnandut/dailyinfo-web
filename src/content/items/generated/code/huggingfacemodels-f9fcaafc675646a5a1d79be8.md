@@ -9,11 +9,11 @@ source:
   external_id: "Aleph-Alpha/Kolibri-1.1"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-27T03:45:13.131511+08:00"
+retrieved_at: "2026-11-28T03:45:54.201639+08:00"
 published_at: "2026-11-26T03:45:39.243523+08:00"
-summary: "Aleph-Alpha 的 Kolibri-1.1 文本生成模型主打高效推理，适合资源受限场景。"
+summary: "Aleph-Alpha 的 Kolibri-1.1 主打小型高效语言模型，强调在有限算力下提供可用的文本生成能力。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-26", "code-2026-11-27"]
+briefing_ids: ["code-2026-11-26", "code-2026-11-27", "code-2026-11-28"]
 ---

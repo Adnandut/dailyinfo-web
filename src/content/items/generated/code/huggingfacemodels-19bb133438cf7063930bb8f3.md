@@ -9,11 +9,11 @@ source:
   external_id: "orcarouter/Inkling-2-Mini-abliterated-GGUF"
 authors: []
 source_published_at: null
-retrieved_at: "2026-11-27T03:45:13.131511+08:00"
+retrieved_at: "2026-11-28T03:45:54.201639+08:00"
 published_at: "2026-11-27T03:45:44.101113+08:00"
-summary: "Inkling-2-Mini 的 abliterated GGUF 量化文本生成版本，面向更开放输出与本地高效推理。"
+summary: "orcarouter 的 Inkling-2-Mini-abliterated-GGUF 是 Inkling-2-Mini 的 abliterated GGUF 变体，便于在本地进行限制更少的文本生成。"
 why_it_matters: null
 tags: []
 language: "zh-CN"
-briefing_ids: ["code-2026-11-27"]
+briefing_ids: ["code-2026-11-27", "code-2026-11-28"]
 ---
