@@ -84,10 +84,11 @@ function chunkText(text) {
  * thread (in channel context); everything else lands inside the thread.
  * progress() edits the acknowledgment so the channel stays clean. */
 class DiscordIO {
-  constructor(message) {
+  constructor(message, forcedChannel = null) {
     this.message = message;
+    this.forcedChannel = forcedChannel; // e.g. the thread under a replied-to digest part
     this.ackMessage = null; // NB: never name this `ack` — it shadows the ack() method
-    this.thread = null;
+    this.thread = forcedChannel;
     this.lastEdit = 0;
     this.typingTimer = null;
     this.finished = false;
@@ -135,6 +136,10 @@ class DiscordIO {
   }
   async ack(text) {
     const payload = { content: clip(text, MAX_MESSAGE_CHARS) };
+    if (this.forcedChannel) {
+      this.ackMessage = await this.forcedChannel.send(payload);
+      return this.ackMessage;
+    }
     try {
       this.ackMessage = await this.message.reply(payload);
     } catch {
@@ -734,15 +739,28 @@ async function runTool(tool, argument, ctx) {
       // "explain article number N" — resolve N against the day's digest
       // (global numbering across sections), then the loop fetches the title.
       const tokens = String(argument ?? '').trim().split(/\s+/).filter(Boolean);
-      const category = tokens.find((t) => /^(papers|arxiv|ai_news|ai-news|code|resource)$/i.test(t))?.replace('-', '_') ?? 'arxiv';
-      const number = Number(tokens.reverse().find((t) => /^\d+$/.test(t)));
+      const number = Number([...tokens].reverse().find((t) => /^\d+$/.test(t)));
       if (!number) return 'DIGEST_ITEM: no item number given. Usage: digest_item "[category] <number>".';
-      const { date, items } = bot.digestItems(category);
-      const item = items.find((it) => it.no === number);
-      if (!item) {
-        return `DIGEST_ITEM: the ${category} digest for ${date || 'the latest day'} has ${items.length} items — number ${number} does not exist. Nearest: #${items.length}.`;
+      const explicit = tokens.find((t) => /^(papers|arxiv|ai_news|ai-news|code|resource)$/i.test(t));
+      const sectionHint = (tokens.find((t) => !/^\d+$/.test(t) && t !== explicit) ?? '').toLowerCase();
+      const categories = explicit ? [explicit.replace('-', '_')] : (sectionHint ? ['papers', 'arxiv'] : ['arxiv', 'papers']);
+      const found = [];
+      for (const category of categories) {
+        const { date, items } = bot.digestItems(category);
+        const item = items.find((it) => it.no === number);
+        if (item) found.push({ category, date, item, matchedHint: sectionHint && item.section.toLowerCase().includes(sectionHint) });
       }
-      return `DIGEST ITEM #${item.no} of the ${category} digest (${date}, section: ${item.section}):\nTITLE: ${item.title}\n\nNow call fetch_paper with exactly this title to explain it.`;
+      if (!found.length) {
+        const sizes = found.length || categories.map((c) => `${c}: ${bot.digestItems(c).items.length} items`).join(', ');
+        return `DIGEST_ITEM: number ${number} not found (${sizes}).`;
+      }
+      const chosen = found.find((f) => f.matchedHint) ?? found[0];
+      const others = found.filter((f) => f !== chosen).map((f) => `#${f.item.no} of ${f.category} (${f.item.section}): ${f.item.title}`).join('; ');
+      return `DIGEST ITEM #${chosen.item.no} of the ${chosen.category} digest (${chosen.date}, section: ${chosen.item.section}):
+TITLE: ${chosen.item.title}
+
+Now call fetch_paper with exactly this title to explain it.`
+        + (others ? `\n(Also found: ${others} - verify against the thread context before choosing.)` : '');
     }
     default:
       return `UNKNOWN TOOL "${tool}" — pick one from the list.`;
@@ -968,7 +986,17 @@ function main() {
       const text = message.content.replace(/<@!?\d+>/g, '').trim() || message.content.trim();
       if (text.length < 2) return;
       console.log(`[discord-agent] ${message.author.username} in #${message.channel.name ?? 'dm'}: ${clip(text, 100)}`);
-      const io = new DiscordIO(message);
+      // If the owner asked in the main channel but as a reply to a digest
+      // part that has a thread, continue inside that thread — the answer
+      // lands where the conversation actually lives.
+      let forcedChannel = null;
+      if (!message.channel.isThread() && message.reference?.messageId) {
+        try {
+          const refMsg = await message.channel.messages.fetch(message.reference.messageId);
+          if (refMsg.hasThread) forcedChannel = await refMsg.fetchThread();
+        } catch { /* reference detection is best-effort */ }
+      }
+      const io = new DiscordIO(message, forcedChannel);
       await io.tryReact('👀'); // instant "agent is alive" signal
       try {
         await agentHandle(text, io);
