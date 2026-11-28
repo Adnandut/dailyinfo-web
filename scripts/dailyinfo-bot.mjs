@@ -334,11 +334,19 @@ async function chatWithModel(entry, messages, { maxTokens = 4096, temperature = 
   }
 }
 
-/** Try the model chain in order; auth errors stop the chain. */
+/** Try the model chain in order; auth errors stop the chain. options.models
+ * overrides the chain with "provider:model" entries - used to route heavy
+ * workloads (paper summaries) to a chosen model and spare the primary. */
 async function chat(messages, options = {}) {
   if (!API_KEY) throw new Error(missingKeyMessage);
+  const chain = Array.isArray(options.models) && options.models.length
+    ? options.models.map((spec) => {
+        const [provider, model] = String(spec).split(':');
+        return providerEntry(provider, model);
+      })
+    : MODEL_CHAIN;
   const errors = [];
-  for (const model of MODEL_CHAIN) {
+  for (const model of chain) {
     try {
       return await chatWithModel(model, messages, options);
     } catch (error) {
@@ -347,7 +355,7 @@ async function chat(messages, options = {}) {
     }
   }
   throw new Error(
-    `All ${errors.length} model(s) failed (${MODEL_CHAIN.map((entry) => `${entry.provider}:${entry.model}`).join(' -> ')}):\n${errors.map((error) => `Ã¢â‚¬â€ ${error.message}`).join('\n')}`,
+    `All ${errors.length} model(s) failed (${chain.map((entry) => `${entry.provider}:${entry.model}`).join(' -> ')}):\n${errors.map((error) => `Ã¢â‚¬â€ ${error.message}`).join('\n')}`,
   );
 }
 
@@ -862,6 +870,14 @@ async function extractPdfText(filePath) {
   return pages.join('\n\n').replaceAll(/[ \t]+/g, ' ').trim();
 }
 
+/** Per-task model override for paper summaries: "provider:model" entries
+ * (comma-separated fallbacks). Keeps the heavy summarization workload off
+ * the primary provider's daily quota. Empty = use the normal chain. */
+const SUMMARY_MODEL_CHAIN = (process.env.BOT_SUMMARY_MODEL ?? '')
+  .split(',')
+  .map((spec) => spec.trim())
+  .filter(Boolean);
+const summaryModels = () => (SUMMARY_MODEL_CHAIN.length ? { models: SUMMARY_MODEL_CHAIN } : {});
 const SUMMARIZE_SYSTEM =
   'You summarize academic papers in precise, plain English for a researcher. ' +
   'Base everything strictly on the provided text; never invent results.';
@@ -875,7 +891,7 @@ async function summarizeText(text) {
         { role: 'system', content: SUMMARIZE_SYSTEM },
         { role: 'user', content: `Summarize this paper text. Structure:\n**Problem** / **Method** / **Key results** (with numbers when present) / **Limitations** / **Why it matters**.\n\n${chunks[0]}` },
       ],
-      { maxTokens: 2048, temperature: 0.2 },
+      { maxTokens: 2048, temperature: 0.2, ...summaryModels() },
     );
   }
   const notes = [];
@@ -889,7 +905,7 @@ async function summarizeText(text) {
     if (index) await pace();
     const batchNotes = await Promise.all(batch.map((chunk) => chat(
       notePrompt(chunk),
-      { maxTokens: 700, temperature: 0.2 },
+      { maxTokens: 700, temperature: 0.2, ...summaryModels() },
     )));
     notes.push(...batchNotes);
   }
@@ -901,7 +917,7 @@ async function summarizeText(text) {
         content: `These are section notes from one paper${truncated ? ' (text was truncated; later sections like references may be missing)' : ''}. Write the final summary. Structure:\n**Problem** / **Method** / **Key results** (numbers when present) / **Limitations** / **Why it matters**.\n\n${notes.join('\n\n')}`,
       },
     ],
-    { maxTokens: 2048, temperature: 0.2 },
+    { maxTokens: 2048, temperature: 0.2, ...summaryModels() },
   );
 }
 
