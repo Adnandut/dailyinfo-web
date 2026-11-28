@@ -143,13 +143,6 @@ class DiscordIO {
       this.ackMessage = await this.message.channel.send(payload);
     }
     await this.tryReact('⏳');
-    if (!this.message.channel.isThread()) {
-      try {
-        this.thread = await this.ackMessage.startThread({ name: clip(text, 60) || 'agent', autoArchiveDuration: 1440 });
-      } catch {
-        /* thread creation is best-effort — replies continue in the channel */
-      }
-    }
     return this.ackMessage;
   }
   async progress(text) {
@@ -475,7 +468,8 @@ const AGENT_SYSTEM =
   + '• Multi-step requests ("find X and save it to Zotero") → plan the minimal tool sequence yourself. '
   + '• zotero_save needs the Zotero desktop app open on this PC; if the result says it is not running, tell the user to open it and say "zotero" again. '
   + '• Citation saving works for ANY fetched paper — paywalled or not. Metadata (title/authors/DOI) is enough; NEVER suggest manual citation entry or make PDF availability a condition for saving. '
-  + '• Ordinal references ("article number 30", "the second paper", "paper #3") resolve against the DAY\'S DIGEST via the digest_item tool (global numbering across sections; infer the category from the thread context — arxiv digest parts are the big numbered lists). Then fetch_paper the returned title. If the number is out of range, say so and give the digest size. Never echo a digest part back, never search for part labels, and never fetch a paper that was not clearly identified. '
+  + '• Ordinal references ("article number 30", "explain number 1") resolve against the daily digest via the digest_item tool. The CATEGORY comes from the thread context: a section like "HESS Daily Digest", "Journal of Hydrology Daily Brief" or "Nature Daily Briefing" = papers; "arXiv CS.AI Daily Digest" = arxiv; "GitHub Trending" = code. After digest_item returns a title, VERIFY it appears in the thread context before fetching - if it does not match, call digest_item with the other category and compare again. If neither matches, ask the user to name the paper. '
+  + '• NEVER promise an action in your final answer ("I will fetch it next"). Either perform the action with tools before answering, or state plainly what you found and what is possible. '
   + '• Paywalled paper + the user wants the full text → offer the university flow: "open the paper via webvpn.dlut.edu.cn, copy the PDF or article URL from the address bar, then say uni <that link>". If they paste such a link, call uni_fetch with it (and append " | <the paywalled paper page URL>" when known) — access is checked with their own session cookie, the PDF is downloaded + summarized, and the link pattern is learned per journal for next time. The uni output is already user-facing; do not repeat it. '
   + '• Small talk or anything needing no tool → reply with {"answer": "..."} immediately. '
   + '• Recurring multi-step workflows have SKILLS — if one matches the request, call use_skill and then follow its instructions step by step with the other tools. '
